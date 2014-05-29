@@ -24,6 +24,11 @@ import java.util.Map;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 
 
@@ -31,14 +36,10 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
  * Naive EnhancementJobManager implementation that keeps its request queue in
  * memory.
  *
- * 
- * @scr.component immediate="true"
- * @scr.service
- * @scr.reference name="EnhancementEngine"
- *                interface="org.apache.stanbol.enhancer.servicesapi.EnhancementEngine"
- *                cardinality="0..n" policy="dynamic"
- *
  */
+@Component(immediate=true)
+@Service
+@Reference(name="EnhancementEngine", referenceInterface=EnhancementEngine.class, policy=ReferencePolicy.DYNAMIC, cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class EngineComponent extends DefaultComponent {
 	
 	private Map<String, EnhancementEngine> engineMap;

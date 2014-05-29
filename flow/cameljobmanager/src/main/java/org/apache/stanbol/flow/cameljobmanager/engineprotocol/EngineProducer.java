@@ -17,12 +17,9 @@
 package org.apache.stanbol.flow.cameljobmanager.engineprotocol;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultProducer;
-import org.apache.camel.spi.TypeConverterRegistry;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
-import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
 
 public class EngineProducer extends DefaultProducer {
     private EngineEndpoint endpoint;

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-
 import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConverter;
@@ -14,8 +13,10 @@ import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.spi.TypeConverterRegistry;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.felix.scr.annotations.Component;
+import org.apache.stanbol.enhancer.contentitem.inmemory.InMemoryContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
-import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
+import org.apache.stanbol.enhancer.servicesapi.impl.ByteArraySource;
+import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -66,13 +67,14 @@ public final class FromContentItemConverter {
 		TypeConverterRegistry registry = exchange.getContext().getTypeConverterRegistry();
 		Class from = file.getBody().getClass();
 		TypeConverter tc = registry.lookup(byte[].class, from);
+		InMemoryContentItemFactory factory = InMemoryContentItemFactory.getInstance();
         if (tc != null) {
             Object body = file.getBody();
             byte[] content = tc.convertTo(byte[].class, exchange, body); 
-            return new InMemoryContentItem(content, mimetype);
+            return factory.createContentItem(new ByteArraySource(content, mimetype));
         }
 		 
-		return new InMemoryContentItem("Error during transformation".getBytes(), mimetype);
+		return factory.createContentItem(new StringSource("Error during transformation", mimetype));
 	}
         
 }

@@ -1,17 +1,23 @@
 package org.apache.stanbol.flow.cameljobmanager.impl;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
-import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.References;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.servicesapi.Chain;
 import org.apache.stanbol.enhancer.servicesapi.ChainException;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
@@ -20,31 +26,27 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.flow.cameljobmanager.engineprotocol.EngineComponent;
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Reference;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Naive EnhancementJobManager implementation that keeps its request queue in
  * memory.
  *
- * @scr.component immediate="true"
- * @scr.service
- *
- * @scr.reference name="Ec"
- * 				  interface="org.apache.camel.Component" 
- * 				  policy="dynamic"
- *
- *@scr.reference name="Route"
- * 				  interface="org.apache.camel.RoutesBuilder" 
- * 				  cardinality="0..n" policy="dynamic"
  */
+@org.apache.felix.scr.annotations.Component(immediate=true)
+@Service(FlowJobManager.class)
+@References({
+		@Reference(referenceInterface=Component.class, name="Ec", policy=ReferencePolicy.DYNAMIC),
+		@Reference(referenceInterface=RoutesBuilder.class, name="Route", cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE, policy=ReferencePolicy.DYNAMIC)
+		})
 public class CamelJobManager implements FlowJobManager {
 	
 	EngineComponent ec;
 	
+	private static final Logger LOG = LoggerFactory.getLogger(CamelJobManager.class);
 	private CamelContext cContext = null;
 	
 	@Reference
@@ -52,10 +54,7 @@ public class CamelJobManager implements FlowJobManager {
 	
 	protected void bindRoute(RoutesBuilder e) throws Exception {
 		RouteBuilder srb = (RouteBuilder)e;
-		cContext.addRoutes(srb);
-		for (RouteDefinition rd : srb.getRouteCollection().getRoutes() ){
-			cContext.startRoute(rd.getId());
-		}
+			addRouteToContext(srb);
     }
 	
 	/**
@@ -118,6 +117,13 @@ public class CamelJobManager implements FlowJobManager {
 
 	public List<EnhancementEngine> getActiveEngines() {
 		return ec.getEnhancementEngines();
+	}
+	
+	private void addRouteToContext(RouteBuilder rb) throws Exception {
+		cContext.addRoutes(rb);
+		for (RouteDefinition rd : rb.getRouteCollection().getRoutes() ){
+			cContext.startRoute(rd.getId());
+		}
 	}
 
 }
