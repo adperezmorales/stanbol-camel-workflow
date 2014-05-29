@@ -3,7 +3,7 @@ including the bundles defined at src/main/bundles/list.xml
 
 To start this after building use:
 
-  java -Xmx512M -jar target/org.apache.stanbol.launchers.full-0.9.0-incubating-SNAPSHOT.jar
+  java -Xmx512M -jar target/org.apache.stanbol.launchers.fullflow-1.0.0-SNAPSHOT.jar
 
 The Stanbol Enhancer HTTP endpoint should then be available at 
 

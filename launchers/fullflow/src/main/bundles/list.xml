@@ -25,7 +25,7 @@
           (internal and external)
        ********************************************************************* -->
   <!-- General-purpose libraries -->
-  <startLevel level="10">
+  <startLevel level="20">
 <!-- 		<bundle> only used by the Contenthub -->
 <!-- 			<groupId>eu.medsea.mimeutil</groupId> -->
 <!-- 			<artifactId>mime-util</artifactId> -->
@@ -34,21 +34,21 @@
   </startLevel>
 
   <!-- Jersey -->
-  <startLevel level="15">
-    <bundle>
+  <startLevel level="25">
+   <!-- <bundle>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>1.7</version>
-    </bundle>
+      <version>1.15</version>
+    </bundle> -->
   </startLevel>
 
   <!-- Stanbol Commons -->
-  <startLevel level="17">
+  <startLevel level="27">
     <!-- The common web interface -->
     <bundle>
       <groupId>org.apache.stanbol</groupId>
       <artifactId>org.apache.stanbol.commons.web.sparql</artifactId>
-      <version>0.9.0-incubating</version>
+      <version>1.0.0-SNAPSHOT</version>
     </bundle>
   </startLevel>
 
@@ -59,7 +59,7 @@
 
   <!-- Stanbol OWL now part of commons -->
   <!--
-  <startLevel level="22">
+  <startLevel level="32">
   </startLevel>
   -->
   
@@ -68,7 +68,13 @@
           (currently the Enhancement Engines)
        ********************************************************************* -->
   
-  <startLevel level="26">
+  <startLevel level="36">
+    <!-- The Content-Editable based UI for Enhancing Text written on a Webpage -->
+    <!-- bundle>
+        <groupId>org.apache.stanbol</groupId>
+        <artifactId>org.apache.stanbol.demos.enhancer.vie</artifactId>
+        <version>0.10.0-SNAPSHOT</version>
+    </bundle -->
   </startLevel>
 
   <!-- *********************************************************************
