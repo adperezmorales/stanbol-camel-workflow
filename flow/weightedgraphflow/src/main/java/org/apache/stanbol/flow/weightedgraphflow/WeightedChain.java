@@ -7,23 +7,24 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.camel.Component;
+import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.felix.scr.annotations.Reference;
-import org.apache.stanbol.flow.cameljobmanager.engineprotocol.EngineComponent;
-import org.apache.stanbol.enhancer.servicesapi.Chain;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.ServiceProperties;
+import org.apache.stanbol.flow.cameljobmanager.engineprotocol.EngineComponent;
 
 /**
- *  @scr.component immediate="true"
- *  @scr.service
- *  @scr.reference name="Ec"
- * 				  interface="org.apache.camel.Component" 
- * 				  policy="dynamic"
- *
+ * WeightedChain camel route example
+ * 
  */
+@org.apache.felix.scr.annotations.Component(immediate=true)
+@Service(RoutesBuilder.class)
+@Reference(name="Ec", referenceInterface=Component.class, policy=ReferencePolicy.DYNAMIC)
 public class WeightedChain extends RouteBuilder {
 	
 	@Reference
