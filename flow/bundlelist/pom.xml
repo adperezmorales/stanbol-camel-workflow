@@ -18,7 +18,7 @@
   <parent>
     <groupId>org.apache.stanbol</groupId>
     <artifactId>org.apache.stanbol.flow.reactor</artifactId>
-    <version>0.9.0-incubating-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -37,4 +37,3 @@
     </plugins>
   </build>
 </project>
-

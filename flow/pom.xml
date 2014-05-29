@@ -16,63 +16,52 @@
    limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache.stanbol</groupId>
-		<artifactId>org.apache.stanbol.enhancer.parent</artifactId>
-		<version>0.9.0-incubating</version>
-<!-- 		<relativePath>../../parent</relativePath> -->
-  </parent>
-  
-  <artifactId>org.apache.stanbol.flow.reactor</artifactId>
-  <version>0.9.0-incubating-SNAPSHOT</version>
-  <packaging>pom</packaging>
+	<parent>
+		<groupId>org.apache.stanbol</groupId>
+		<artifactId>stanbol-parent</artifactId>
+		<version>5-SNAPSHOT</version>
+	</parent>
 
-  <name>Apache Stanbol Flow : Maven Flow Reactor</name>
-  <description>
+	<artifactId>org.apache.stanbol.flow.reactor</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Apache Stanbol Flow : Maven Flow Reactor</name>
+	<description>
     Build and compile all modules from Flow implementation.
-	This module use the Apache Camel librairy, and bring to you the power of the "route" concept and a lot of build-in endpoints.
+	This module use the Apache Camel library, and bring to you the power of the "route" concept and a lot of built-in endpoints.
 	Please refer to Apache Camel website for more informations.
   </description>
-  <inceptionYear>2012</inceptionYear>
-
-  <scm>
-    <connection>
-      scm:svn:http://svn.apache.org/repos/asf/incubator/stanbol/trunk/flow
-    </connection>
-    <developerConnection>
-      scm:svn:https://svn.apache.org/repos/asf/incubator/stanbol/trunk/flow
-    </developerConnection>
-    <url>http://incubator.apache.org/stanbol/</url>
-  </scm>
+	<inceptionYear>2014</inceptionYear>
 
 	<dependencyManagement>
-    <dependencies>
-      <!-- Stanbol Flow Deps -->
-      <dependency>
-	<groupId>org.apache.stanbol</groupId>
-	<artifactId>org.apache.stanbol.flow.cameljobmanager</artifactId>
-	<version>0.9.0-incubating-SNAPSHOT</version>
-      </dependency>
-	<dependency>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
-<version>0.9.0-incubating-SNAPSHOT</version>
-		</dependency>
-    </dependencies>
-</dependencyManagement>
-	
+		<dependencies>
+			<!-- Stanbol Flow Deps -->
+			<dependency>
+				<groupId>org.apache.stanbol</groupId>
+				<artifactId>org.apache.stanbol.flow.cameljobmanager</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.stanbol</groupId>
+				<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
-  <modules>
-    <module>servicesapi</module>
-    <module>web</module>
-    <module>cameljobmanager</module>
-    <module>weightedgraphflow</module>
-    <module>filepoolgraphflow</module>
-    <module>bundlelist</module>
-  </modules>
+
+	<modules>
+		<module>servicesapi</module>
+		<module>web</module>
+		<module>cameljobmanager</module>
+		<module>weightedgraphflow</module>
+		<module>filepoolgraphflow</module>
+		<module>bundlelist</module>
+	</modules>
 
 </project>

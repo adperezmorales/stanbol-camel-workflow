@@ -36,52 +36,47 @@
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
-			<version>0.9.0-incubating-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 		
 	</startLevel>
 
 	<!-- Web Fragment -->
-	<startLevel level="21">
+	<startLevel level="31">
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.flow.web</artifactId>
-			<version>0.9.0-incubating-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 	</startLevel>
 
-	<!-- Benchmarks for the Stanbol Enhancer -->
-	<startLevel level="21">
-
-	</startLevel>
 	
   <!-- Stanbol Enhancer plug-ins (the Enhancement Engines) -->
-  <startLevel level="25">
+  <startLevel level="35">
 	
   </startLevel>	
 
-	<!-- StartLevel for the chainjobmanager : after engines (level 25 to 26) 
-		and before chains (level 29) -->
-	<startLevel level="28">
+	<!-- StartLevel for the cameljobmanager : after engines (level 36)	 -->
+	<startLevel level="36">
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.flow.cameljobmanager</artifactId>
-			<version>0.9.0-incubating-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 	</startLevel>
 
-	<!-- Chain start -->
-	<startLevel level="29">
+	<!-- Chain start : after cameljobmanager -->
+	<startLevel level="40"> 
 		<!-- filepool chain to activate after -->
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.flow.filepoolgraphflow</artifactId>
-			<version>0.9.0-incubating-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.flow.weightedgraphflow</artifactId>
-			<version>0.9.0-incubating-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 	</startLevel>
 

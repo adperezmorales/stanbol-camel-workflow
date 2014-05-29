@@ -23,27 +23,18 @@
 	<parent>
 		<groupId>org.apache.stanbol</groupId>
 		<artifactId>org.apache.stanbol.flow.reactor</artifactId>
-		<version>0.9.0-incubating-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 	
 	<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<name>Apache Stanbol Flow : Services API</name>
 	<description>The Stanbol Flow Services API</description>
 
-	<inceptionYear>2012</inceptionYear>
-
-    <scm>
-        <connection>
-            scm:svn:http://svn.apache.org/repos/asf/incubator/stanbol/trunk/flow/servicesapi/
-        </connection>
-        <developerConnection>
-            scm:svn:https://svn.apache.org/repos/asf/incubator/stanbol/trunk/flow/servicesapi/
-        </developerConnection>
-        <url>http://incubator.apache.org/stanbol/</url>
-    </scm>
+	<inceptionYear>2014</inceptionYear>
 
 	<build>
 		<plugins>
@@ -71,6 +62,7 @@
 		<dependency>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.clerezza</groupId>
