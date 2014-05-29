@@ -17,19 +17,22 @@
 package org.apache.stanbol.flow.jersey.resource;
 
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
-import static org.apache.stanbol.commons.web.base.CorsHelper.addCORSOrigin;
 import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper.getReference;
 import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper.getReferences;
 import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper.getString;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.OntologicalClasses.DBPEDIA_ORGANISATION;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.OntologicalClasses.DBPEDIA_PERSON;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.OntologicalClasses.DBPEDIA_PLACE;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.OntologicalClasses.DC_LINGUISTIC_SYSTEM;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.OntologicalClasses.SKOS_CONCEPT;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_LANGUAGE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_RELATION;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_TYPE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_CONFIDENCE;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_END;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_ENTITY_LABEL;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_ENTITY_REFERENCE;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_START;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.GEO_LAT;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.GEO_LONG;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses.ENHANCER_ENTITYANNOTATION;
@@ -37,6 +40,8 @@ import static org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses.ENHAN
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.DateFormat;
@@ -44,7 +49,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,7 +59,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -65,7 +68,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.clerezza.rdf.core.Language;
-import org.apache.clerezza.rdf.core.Literal;
 import org.apache.clerezza.rdf.core.LiteralFactory;
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.NonLiteral;
@@ -74,33 +76,32 @@ import org.apache.clerezza.rdf.core.Resource;
 import org.apache.clerezza.rdf.core.Triple;
 import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.access.TcManager;
-import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
 import org.apache.clerezza.rdf.core.impl.TripleImpl;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.apache.clerezza.rdf.core.sparql.ParseException;
 import org.apache.clerezza.rdf.ontologies.RDF;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.stanbol.commons.indexedgraph.IndexedMGraph;
-import org.apache.stanbol.commons.web.base.resource.BaseStanbolResource;
+import org.apache.stanbol.commons.viewable.Viewable;
+import org.apache.stanbol.commons.web.base.resource.LayoutConfiguration;
+import org.apache.stanbol.commons.web.base.resource.TemplateLayoutConfiguration;
 import org.apache.stanbol.enhancer.servicesapi.Blob;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
+import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.NoSuchPartException;
 import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
 import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
 import org.apache.stanbol.enhancer.servicesapi.helper.ExecutionMetadataHelper;
-import org.apache.stanbol.enhancer.servicesapi.helper.ExecutionPlanHelper;
+import org.apache.stanbol.enhancer.servicesapi.helper.execution.ChainExecution;
+import org.apache.stanbol.enhancer.servicesapi.helper.execution.Execution;
 import org.apache.stanbol.enhancer.servicesapi.rdf.ExecutionMetadata;
-import org.apache.stanbol.enhancer.servicesapi.rdf.ExecutionPlan;
+import org.apache.stanbol.enhancer.servicesapi.rdf.OntologicalClasses;
 import org.apache.stanbol.enhancer.servicesapi.rdf.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.view.Viewable;
-
-public class ContentItemResource extends BaseStanbolResource {
+public class ContentItemResource extends TemplateLayoutConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -125,48 +126,53 @@ public class ContentItemResource extends BaseStanbolResource {
 
     protected URI metadataHref;
 
-    protected final TcManager tcManager;
-
     protected final Serializer serializer;
 
     protected String serializationFormat = SupportedFormat.RDF_XML;
-
+    /**
+     * Used to format dates on the UI
+     */
+    protected DateFormat format = new SimpleDateFormat("HH-mm-ss.SSS");
 
     /**
      * Map holding the extraction mapped by {@link Properties#DC_TYPE} and the
      * {@link Properties#ENHANCER_SELECTED_TEXT}.
      * This map is initialised by {@link #initOccurrences()}.
      */
-    protected Map<UriRef,Map<String,EntityExtractionSummary>> extractionsByTypeMap = 
-        new HashMap<UriRef,Map<String,EntityExtractionSummary>>();
+    protected Map<UriRef,Map<EntityExtractionSummary,EntityExtractionSummary>> extractionsByTypeMap = 
+        new HashMap<UriRef,Map<EntityExtractionSummary,EntityExtractionSummary>>();
 
     private MGraph executionMetadata;
 
     private ChainExecution chainExecution;
 
-    private ArrayList<org.apache.stanbol.flow.jersey.resource.ContentItemResource.Execution> engineExecutions;
+    private List<org.apache.stanbol.enhancer.servicesapi.helper.execution.Execution> engineExecutions;
+
+    private EnhancementException enhancementException;
+    private LayoutConfiguration layoutConfiguration;
+    private UriInfo uriInfo;
     
     public ContentItemResource(String localId,
                                ContentItem ci,
                                UriInfo uriInfo,
                                String storePath,
-                               TcManager tcManager,
                                Serializer serializer,
-                               ServletContext servletContext) throws IOException {
+                               LayoutConfiguration layoutConfiguration,
+                               EnhancementException enhancementException) throws IOException {
         this.contentItem = ci;
         this.localId = localId;
         this.uriInfo = uriInfo;
-        this.tcManager = tcManager;
         this.serializer = serializer;
-        this.servletContext = servletContext;
-
+        this.layoutConfiguration = layoutConfiguration;
+        //this.servletContext = servletContext;
+        this.enhancementException = enhancementException;
         if (localId != null) {
             URI rawURI = uriInfo.getBaseUriBuilder().path(storePath).path("raw").path(localId).build();
             Entry<UriRef,Blob> plainTextContentPart = ContentItemHelper.getBlob(contentItem, Collections.singleton("text/plain"));
             if (plainTextContentPart != null) {
                 this.textContent = ContentItemHelper.getText(plainTextContentPart.getValue());
             } 
-            if (ci.getMimeType().startsWith("image/")) {
+            if (ci.getBlob().getMimeType().startsWith("image/")) {
                 this.imageSrc = rawURI;
             }
             this.downloadHref = rawURI;
@@ -176,9 +182,12 @@ public class ContentItemResource extends BaseStanbolResource {
         defaultThumbnails.put(DBPEDIA_ORGANISATION, getStaticRootUrl() + "/home/images/organization_48.png");
         defaultThumbnails.put(DBPEDIA_PLACE, getStaticRootUrl() + "/home/images/compass_48.png");
         defaultThumbnails.put(SKOS_CONCEPT, getStaticRootUrl() + "/home/images/black_gear_48.png");
+        defaultThumbnails.put(DC_LINGUISTIC_SYSTEM, getStaticRootUrl()+"/home/images/language_48.png");
         defaultThumbnails.put(null, getStaticRootUrl() + "/home/images/unknown_48.png");
         long start = System.currentTimeMillis();
-        initOccurrences();
+        if(enhancementException == null){
+            initOccurrences();
+        }
         //init ExecutionMetadata
         try {
             executionMetadata = ci.getPart(ExecutionMetadata.CHAIN_EXECUTION, MGraph.class);
@@ -201,11 +210,27 @@ public class ContentItemResource extends BaseStanbolResource {
         }
         log.info(" ... {}ms fro parsing Enhancement Reuslts",System.currentTimeMillis()-start);
     }
+    
+    @Override
+    protected LayoutConfiguration getLayoutConfiguration() {
+        return layoutConfiguration;
+    }
+    
+    @Override
+    protected UriInfo getUriInfo() {
+        return uriInfo;
+    }
 
     public String getRdfMetadata(String mediatype) throws UnsupportedEncodingException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        serializer.serialize(out, contentItem.getMetadata(), mediatype);
-        return out.toString("utf-8");
+        if(enhancementException == null){
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            serializer.serialize(out, contentItem.getMetadata(), mediatype);
+            return out.toString("utf-8");
+        } else {//in case of an exception print the stacktrace
+            StringWriter writer = new StringWriter();
+            enhancementException.printStackTrace(new PrintWriter(writer));
+            return writer.toString();
+        }
     }
 
     public String getRdfMetadata() throws UnsupportedEncodingException {
@@ -239,7 +264,7 @@ public class ContentItemResource extends BaseStanbolResource {
      * Checks if there are Occurrences
      */
     public boolean hasOccurrences(){
-        for(Map<String,EntityExtractionSummary> occ : extractionsByTypeMap.values()){
+        for(Map<EntityExtractionSummary,EntityExtractionSummary> occ : extractionsByTypeMap.values()){
             if(!occ.isEmpty()){
                 return true;
             }
@@ -255,10 +280,11 @@ public class ContentItemResource extends BaseStanbolResource {
         types.remove(DBPEDIA_ORGANISATION);
         types.remove(DBPEDIA_PLACE);
         types.remove(SKOS_CONCEPT);
+        types.remove(DC_LINGUISTIC_SYSTEM);
         types.remove(null); //other
         return types;
     }
-    public String extractLabel(UriRef uri){
+    public static String extractLabel(UriRef uri){
         String fullUri = uri.getUnicodeString();
         int index = Math.max(fullUri.lastIndexOf('#'),fullUri.lastIndexOf('/'));
         index = Math.max(index, fullUri.lastIndexOf(':'));
@@ -270,7 +296,7 @@ public class ContentItemResource extends BaseStanbolResource {
         }
     }
     public Collection<EntityExtractionSummary> getOccurrences(UriRef type){
-        Map<String,EntityExtractionSummary> typeMap = extractionsByTypeMap.get(type);
+        Map<EntityExtractionSummary,EntityExtractionSummary> typeMap = extractionsByTypeMap.get(type);
         Collection<EntityExtractionSummary> typeOccurrences;
         if(typeMap != null){
             typeOccurrences = typeMap.values();
@@ -296,6 +322,15 @@ public class ContentItemResource extends BaseStanbolResource {
     }
     public Collection<EntityExtractionSummary> getConceptOccurrences() throws ParseException {
         return getOccurrences(SKOS_CONCEPT);
+    }
+    /**
+     * Returns the Language Annotations
+     * @since 0.11.0
+     * @return
+     * @throws ParseException
+     */
+    public Collection<EntityExtractionSummary> getLanguageOccurrences() throws ParseException {
+        return getOccurrences(OntologicalClasses.DC_LINGUISTIC_SYSTEM);
     }
     enum EAProps {
         label,
@@ -335,31 +370,40 @@ public class ContentItemResource extends BaseStanbolResource {
         Iterator<Triple> textAnnotations = graph.filter(null, RDF.type, ENHANCER_TEXTANNOTATION);
         while(textAnnotations.hasNext()){
             NonLiteral textAnnotation = textAnnotations.next().getSubject();
-            if (graph.filter(textAnnotation, DC_RELATION, null).hasNext()) {
-                // this is not the most specific occurrence of this name: skip
-                continue;
-            }
+            //we need to process those to show multiple mentions
+//            if (graph.filter(textAnnotation, DC_RELATION, null).hasNext()) {
+//                // this is not the most specific occurrence of this name: skip
+//                continue;
+//            }
             String text = getString(graph, textAnnotation, Properties.ENHANCER_SELECTED_TEXT);
-            if(text == null){
-                //ignore text annotations without text
-                continue;
-            }
+            //TextAnnotations without fise:selected-text are no longer ignored
+//            if(text == null){
+//                //ignore text annotations without text
+//                continue;
+//            }
+            Integer start = EnhancementEngineHelper.get(graph,textAnnotation, 
+                ENHANCER_START,Integer.class,lf);
+            Integer end = EnhancementEngineHelper.get(graph,textAnnotation, 
+                ENHANCER_END,Integer.class,lf);
+            Double confidence = EnhancementEngineHelper.get(graph, textAnnotation, 
+                ENHANCER_CONFIDENCE, Double.class, lf);
             Iterator<UriRef> types = getReferences(graph, textAnnotation, DC_TYPE);
             if(!types.hasNext()){ //create an iterator over null in case no types are present
                 types = Collections.singleton((UriRef)null).iterator();
             }
             while(types.hasNext()){
                 UriRef type = types.next();
-                Map<String,EntityExtractionSummary> occurrenceMap = extractionsByTypeMap.get(type);
+                Map<EntityExtractionSummary,EntityExtractionSummary> occurrenceMap = extractionsByTypeMap.get(type);
                 if(occurrenceMap == null){
-                    occurrenceMap = new TreeMap<String,EntityExtractionSummary>(String.CASE_INSENSITIVE_ORDER);
+                    occurrenceMap = new TreeMap<EntityExtractionSummary,EntityExtractionSummary>();
                     extractionsByTypeMap.put(type, occurrenceMap);
                 }
-                EntityExtractionSummary entity = occurrenceMap.get(text);
-                if(entity == null){
-                    entity = new EntityExtractionSummary(text, type, defaultThumbnails);
-                    occurrenceMap.put(text, entity);
+                //in case of a language annotation use the detected language as label
+                if(DC_LINGUISTIC_SYSTEM.equals(type)){
+                    text = EnhancementEngineHelper.getString(graph, textAnnotation, 
+                        DC_LANGUAGE);
                 }
+                EntityExtractionSummary entity = new EntityExtractionSummary(text, type, start,end,confidence,defaultThumbnails);
                 Collection<NonLiteral> suggestions = suggestionMap.get(textAnnotation);
                 if(suggestions != null){
                     for(NonLiteral entityAnnotation : suggestions){
@@ -371,10 +415,110 @@ public class ContentItemResource extends BaseStanbolResource {
                             graph);
                     }
                 }
+                EntityExtractionSummary existingSummary = occurrenceMap.get(entity);
+                if(existingSummary == null){//new extraction summary
+                    occurrenceMap.put(entity, entity);
+                } else {
+                    //extraction summary with this text and suggestions already
+                    //present ... only add a mention to the existing
+                    existingSummary.addMention(new Mention(text, start, end, confidence));
+                }
             }
         }
     }
+    /**
+     * Mentions of {@link EntityExtractionSummary EntityExtractionSummaries}. 
+     * @author Rupert Westenthaler
+     *
+     */
+    public static class Mention implements Comparable<Mention>{
+        private String name;
+        private Integer start;
+        private Integer end;
+        private Double conf;
 
+        Mention(String name,Integer start, Integer end, Double confidence){
+            if(name == null && start == null && end == null){
+                this.name = "[global]";
+                //throw new IllegalStateException("The name for a Mention MUST NOT be NULL!");
+            } else if(name == null) {
+                this.name = "[section]";
+            } else {
+                this.name = name;
+            }
+            this.start = start;
+            this.end = end;
+            this.conf = confidence;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        public Integer getStart() {
+            return start;
+        }
+        public Integer getEnd() {
+            return end;
+        }
+        public Double getConfidence() {
+            return conf;
+        }
+        public boolean hasOccurrence() {
+            return start != null && end != null;
+        }
+        public boolean hasConfidence(){
+            return conf != null;
+        }
+        @Override
+        public int hashCode() {
+            return name.hashCode() + 
+                    (start != null ? start.hashCode() : 0) +
+                    (end != null ? end.hashCode() : 0);
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if(obj instanceof Mention){
+                Mention o = (Mention)obj;
+                if(o.name.equals(name)){
+                    if((o.start != null && o.start.equals(start)) ||
+                            (o.start == null && start == null)){
+                        if(o.end != null && o.end.equals(end)){
+                            return true;
+                        } else {
+                            return o.end == null && end == null;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        
+        @Override
+        public int compareTo(Mention o) {
+            int c = String.CASE_INSENSITIVE_ORDER.compare(o.name, this.name);
+            if(c == 0){
+                if(start != null && o.start != null){
+                    c = start.compareTo(o.start);
+                } else if(o.start != null){
+                    c = 1;
+                } else if(start != null){
+                    c = -1;
+                }
+                if(c == 0){
+                    if(o.end != null && end != null){
+                        c = end.compareTo(o.end);
+                    } else if(o.end != null){
+                        c = -1;
+                    } else if(end != null){
+                        c = 1;
+                    }
+                }
+            }
+            return c;
+        }
+    }
+    
     public ChainExecution getChainExecution(){
         return chainExecution;
     }
@@ -382,33 +526,100 @@ public class ContentItemResource extends BaseStanbolResource {
     public Collection<Execution> getEngineExecutions(){
         return engineExecutions;
     }
-    
-    
+    public String getExecutionOffsetText(Execution ex){
+        if(ex.getChain() == null || ex.getChain().getStarted() == null || ex.getStarted() == null){
+            return null;
+        } else {
+            return String.format("%6dms",ex.getStarted().getTime() - ex.getChain().getStarted().getTime());
+        }
+    }
+    public String getExecutionDurationText(Execution ex){
+        if(ex.getDuration() == null){
+            return "[duration not available]";
+        } else if(ex.getDuration() < 1025){
+            return ex.getDuration()+"ms";
+        } else {
+            return String.format("%.2fsec",(ex.getDuration().floatValue()/1000));
+        }
+    }
+    public String getExecutionStartTime(Execution ex){
+        if(ex.getStarted() != null){
+            return format.format(ex.getStarted());
+        } else {
+            return "unknown";
+        }
+    }
+    public String getExecutionCompletionTime(Execution ex){
+        if(ex.getCompleted() != null){
+            return format.format(ex.getCompleted());
+        } else {
+            return "unknown";
+        }
+    }    
+    public String getExecutionStatusText(Execution ex){
+        if(ExecutionMetadata.STATUS_COMPLETED.equals(ex.getStatus())){
+            return "completed";
+        } else if(ExecutionMetadata.STATUS_FAILED.equals(ex.getStatus())){
+            return "failed";
+        } else if(ExecutionMetadata.STATUS_IN_PROGRESS.equals(ex.getStatus())){
+            return "in-progress";
+        } else if(ExecutionMetadata.STATUS_SCHEDULED.equals(ex.getStatus())){
+            return "scheduled";
+        } else if(ExecutionMetadata.STATUS_SKIPPED.equals(ex.getStatus())){
+            return "skipped";
+        } else {
+            return "unknown";
+        }
+    }    
     public static class EntityExtractionSummary implements Comparable<EntityExtractionSummary> {
 
         protected final String name;
 
+        
         protected final UriRef type;
 
         protected List<EntitySuggestion> suggestions = new ArrayList<EntitySuggestion>();
+        protected Set<UriRef> suggestionSet = new HashSet<UriRef>();
 
-        protected List<String> mentions = new ArrayList<String>();
+        protected List<Mention> mentions = new ArrayList<Mention>();
 
         public final Map<UriRef,String> defaultThumbnails;
 
-        public EntityExtractionSummary(String name, UriRef type, Map<UriRef,String> defaultThumbnails) {
-            this.name = name;
+
+        private Integer start;
+
+        private Integer end;
+
+
+        private Double confidence;
+
+        public EntityExtractionSummary(String name, UriRef type, Integer start, Integer end, Double confidence, Map<UriRef,String> defaultThumbnails) {
+            if(name == null){
+                this.name = extractLabel(type);
+            } else {
+                this.name = name;
+            }
             this.type = type;
-            mentions.add(name);
+            mentions.add(new Mention(name, start, end, confidence));
             this.defaultThumbnails = defaultThumbnails;
+            this.start = start;
+            this.end = end;
+            this.confidence = confidence;
         }
 
         public void addSuggestion(UriRef uri, String label, Double confidence, TripleCollection properties) {
             EntitySuggestion suggestion = new EntitySuggestion(uri, type, label, confidence, properties,
                     defaultThumbnails);
+            suggestionSet.add(uri);
             if (!suggestions.contains(suggestion)) {
                 suggestions.add(suggestion);
                 Collections.sort(suggestions);
+            }
+        }
+        public void addMention(Mention mention){
+            if(!mentions.contains(mention)){
+                mentions.add(mention);
+                Collections.sort(mentions);
             }
         }
 
@@ -419,13 +630,22 @@ public class ContentItemResource extends BaseStanbolResource {
             }
             return name;
         }
-
+        public String getSelected(){
+            return name;
+        }
         public String getUri() {
             EntitySuggestion bestGuess = getBestGuess();
             if (bestGuess != null) {
                 return bestGuess.getUri();
             }
             return null;
+        }
+        public Double getConfidence(){
+            EntitySuggestion bestGuess = getBestGuess();
+            if (bestGuess != null) {
+                return bestGuess.getConfidence();
+            }
+            return confidence;
         }
 
         public String getSummary() {
@@ -434,7 +654,15 @@ public class ContentItemResource extends BaseStanbolResource {
             }
             return suggestions.get(0).getSummary();
         }
-
+        public Integer getStart() {
+            return start;
+        }
+        public Integer getEnd() {
+            return end;
+        }
+        public boolean hasOccurrence(){
+            return start != null && end != null;
+        }
         public String getThumbnailSrc() {
             if (suggestions.isEmpty()) {
                 return getMissingThumbnailSrc();
@@ -456,18 +684,41 @@ public class ContentItemResource extends BaseStanbolResource {
             }
             return suggestions.get(0);
         }
-
+        
         public List<EntitySuggestion> getSuggestions() {
             return suggestions;
         }
 
-        public List<String> getMentions() {
+        public List<Mention> getMentions() {
             return mentions;
         }
 
         @Override
         public int compareTo(EntityExtractionSummary o) {
-            return getName().compareTo(o.getName());
+            int c = String.CASE_INSENSITIVE_ORDER.compare(getName(),o.getName());
+            if(c == 0){
+                if(suggestionSet.equals(o.suggestionSet)){
+                    return 0; //assume as equals if name and suggestionSet is the same
+                } else { //sort by mention
+                    if(start != null && o.start != null){
+                        c = start.compareTo(o.start);
+                    } else if(o.start != null){
+                        c = 1;
+                    } else if(start != null){
+                        c = -1;
+                    }
+                    if(c == 0){
+                        if(o.end != null && end != null){
+                            c = end.compareTo(o.end);
+                        } else if(o.end != null){
+                            c = -1;
+                        } else if(end != null){
+                            c = 1;
+                        }
+                    }
+                }
+            }
+            return c;
         }
 
         @Override
@@ -478,10 +729,14 @@ public class ContentItemResource extends BaseStanbolResource {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-
             EntityExtractionSummary that = (EntityExtractionSummary) o;
-
-            return !(name != null ? !name.equals(that.name) : that.name != null);
+            //if name and suggestions are the same ... consider as equals
+            if(getName().equalsIgnoreCase(getName())){
+                return suggestionSet.equals(that.suggestionSet);
+            } else {
+                return false;
+            }
+            //return !(name != null ? !name.equals(that.name) : that.name != null);
         }
 
         @Override
@@ -511,7 +766,11 @@ public class ContentItemResource extends BaseStanbolResource {
                                 TripleCollection entityProperties,
                                 Map<UriRef,String> defaultThumbnails) {
             this.uri = uri;
-            this.label = label;
+            if(label == null){
+                this.label = extractLabel(uri);
+            } else {
+                this.label = label;
+            }
             this.type = type;
             this.confidence = confidence != null ? confidence : 0.0;
             this.entityProperties = entityProperties;
@@ -640,186 +899,8 @@ public class ContentItemResource extends BaseStanbolResource {
     public Response get(@Context HttpHeaders headers) {
         ResponseBuilder rb = Response.ok(new Viewable("index", this));
         rb.header(HttpHeaders.CONTENT_TYPE, TEXT_HTML+"; charset=utf-8");
-        addCORSOrigin(servletContext,rb, headers);
+//        addCORSOrigin(servletContext,rb, headers);
         return rb.build();
-    }
-    
-    public class ExecutionNode {
-        
-        private final NonLiteral node;
-        private final TripleCollection ep;
-        private final boolean optional;
-        private final String engineName;
-        
-        public ExecutionNode(TripleCollection executionPlan, NonLiteral node) {
-            this.node = node;
-            this.ep = executionPlan;
-            this.optional = ExecutionPlanHelper.isOptional(ep, node);
-            this.engineName = ExecutionPlanHelper.getEngine(ep, node);
-        }
-        
-        public boolean isOptional() {
-            return optional;
-        }
-        public String getEngineName() {
-            return engineName;
-        }
-        
-        @Override
-        public int hashCode() {
-            return node.hashCode();
-        }
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof ExecutionNode && ((ExecutionNode)o).node.equals(node);
-        }
-    }
-    public class Execution implements Comparable<Execution>{
-        
-        protected DateFormat format = new SimpleDateFormat("HH-mm-ss.SSS");
-        protected final NonLiteral node;
-        private final ExecutionNode executionNode;
-        private final UriRef status;
-        protected final TripleCollection graph;
-        private final Date started;
-        private final Date completed;
-        private final Long duration;
-        private ChainExecution chain;
-        public Execution(ChainExecution parent, TripleCollection graph, NonLiteral node) {
-            this.chain = parent;
-            this.graph = graph;
-            this.node = node;
-            NonLiteral executionNode = ExecutionMetadataHelper.getExecutionNode(graph, node);
-            if(executionNode != null){
-                this.executionNode = new ExecutionNode(graph, executionNode);
-            } else {
-                this.executionNode = null;
-            }
-            this.status = getReference(graph, node, ExecutionMetadata.STATUS);
-            this.started = ExecutionMetadataHelper.getStarted(graph, node);
-            this.completed = ExecutionMetadataHelper.getCompleted(graph, node);
-            if(started != null && completed != null){
-                this.duration = completed.getTime() - started.getTime();
-            } else {
-                this.duration = null;
-            }
-        }
-
-        /**
-         * @return the executionNode
-         */
-        public ExecutionNode getExecutionNode() {
-            return executionNode;
-        }
-        public String getStatusText(){
-            if(ExecutionMetadata.STATUS_COMPLETED.equals(status)){
-                return "completed";
-            } else if(ExecutionMetadata.STATUS_FAILED.equals(status)){
-                return "failed";
-            } else if(ExecutionMetadata.STATUS_IN_PROGRESS.equals(status)){
-                return "in-progress";
-            } else if(ExecutionMetadata.STATUS_SCHEDULED.equals(status)){
-                return "scheduled";
-            } else if(ExecutionMetadata.STATUS_SKIPPED.equals(status)){
-                return "skipped";
-            } else {
-                return "unknown";
-            }
-        }
-        public Date getStart(){
-            return started;
-        }
-        public Date getCompleted(){
-            return completed;
-        }
-        public boolean isFailed(){
-            return ExecutionMetadata.STATUS_FAILED.equals(status);
-        }
-        public boolean isCompleted(){
-            return ExecutionMetadata.STATUS_COMPLETED.equals(status);
-        }
-        public String getOffsetText(){
-            if(chain == null || chain.getStart() == null || started == null){
-                return null;
-            } else {
-                return String.format("%6dms",started.getTime() - chain.getStart().getTime());
-            }
-        }
-        public String getDurationText(){
-            if(duration == null){
-                return "[duration not available]";
-            } else if(duration < 1025){
-                return duration+"ms";
-            } else {
-                return String.format("%.2fsec",(duration.floatValue()/1000));
-            }
-        }
-        public String getStartTime(){
-            if(started != null){
-                return format.format(started);
-            } else {
-                return "unknown";
-            }
-        }
-        public String getCompletionTime(){
-            if(completed != null){
-                return format.format(completed);
-            } else {
-                return "unknown";
-            }
-        }
-        @Override
-        public int hashCode() {
-            return node.hashCode();
-        }
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof ExecutionNode && ((ExecutionNode)o).node.equals(node);
-        }
-        @Override
-        public int compareTo(Execution e2) {
-            if(started != null && e2.started != null){
-                int result = started.compareTo(e2.started);
-                if(result == 0){
-                    if(completed != null && e2.completed != null){
-                        result = started.compareTo(e2.completed);
-                        if(result == 0){
-                            return node.toString().compareTo(e2.toString());
-                        } else {
-                            return result;
-                        }
-                    } else if (completed == null && e2.completed == null){
-                        return node.toString().compareTo(e2.toString());
-                    } else {
-                        return completed == null ? -1 : 1;
-                    }
-                } else {
-                    return result;
-                }
-            } else if (started == null && e2.started == null){
-                return node.toString().compareTo(e2.toString());
-            } else {
-                return started == null ? -1 : 1;
-            }
-        }
-    }
-    public class ChainExecution extends Execution {
-        
-        private final String chainName;
-        
-        public ChainExecution(TripleCollection graph, NonLiteral node) {
-            super(null,graph,node);
-            NonLiteral ep = ExecutionMetadataHelper.getExecutionPlanNode(graph, node);
-            if(ep != null){
-                chainName = EnhancementEngineHelper.getString(graph, ep, ExecutionPlan.CHAIN);
-            } else {
-                chainName = null;
-            }
-        }
-        
-        public String getChainName(){
-            return chainName;
-        }
     }
     
 }

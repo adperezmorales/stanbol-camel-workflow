@@ -18,91 +18,102 @@ package org.apache.stanbol.flow.jersey.reader;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper.randomUUID;
-import static org.apache.stanbol.flow.jersey.utils.EnhancementPropertiesHelper.ENHANCEMENT_PROPERTIES_URI;
-import static org.apache.stanbol.flow.jersey.utils.EnhancementPropertiesHelper.PARSED_CONTENT_URIS;
-import static org.apache.stanbol.flow.jersey.utils.EnhancementPropertiesHelper.getEnhancementProperties;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_LANGUAGE;
+import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.PARSED_CONTENT_URIS;
+import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.REQUEST_PROPERTIES_URI;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
-import org.apache.clerezza.rdf.jena.parser.JenaParserProvider;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.commons.indexedgraph.IndexedMGraph;
-import org.apache.stanbol.commons.web.base.ContextHelper;
 import org.apache.stanbol.enhancer.servicesapi.Blob;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
-import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryBlob;
-import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
-import org.apache.stanbol.flow.jersey.utils.EnhancementPropertiesHelper;
+import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
+import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
+import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
+import org.apache.stanbol.enhancer.servicesapi.impl.StreamSource;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.mapped.SimpleConverter;
-import org.mortbay.log.Log;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component
+@Service(Object.class)
+@Property(name = "javax.ws.rs", boolValue = true)
 @Provider
 public class ContentItemReader implements MessageBodyReader<ContentItem> {
     
+    
     private static Logger log = LoggerFactory.getLogger(ContentItemReader.class);
     FileUpload fu = new FileUpload();
-    private Parser __parser;
-    private ServletContext context;
+    @Reference
+    private Parser parser;
+
+    @Reference
+    private ContentItemFactory ciFactory;
+    
+    /**
+     * Used to read the queryParameter with the ContentItem ID
+     */
+    @Context
+    UriInfo uriInfo;
+    /**
+     * Used to access the Content-Language header for STANBOL-660
+     */
+    @Context
+    HttpHeaders headers;
     
     public static final MediaType MULTIPART = MediaType.valueOf(MediaType.MULTIPART_FORM_DATA_TYPE.getType()+"/*");
 
-    public ContentItemReader(@Context ServletContext context) {
-        this.context = context;
+    
+    protected Parser getParser(){
+        return parser;
     }
-    /**
-     * Lazy initialisation for the parser.
-     * @return teh parser
-     */
-    protected final Parser getParser(){
-        /*
-         * Needed because Jersey tries to create an instance
-         * during initialisation. At that time the {@link BundleContext} required
-         * by {@link ContextHelper#getServiceFromContext(Class, ServletContext)}
-         * is not yet present resulting in an Exception.
-         */
-        if(__parser == null){
-            if(context != null){
-                __parser = ContextHelper.getServiceFromContext(Parser.class, context);
-            } else { //mainly for unit tests we want also allow initialisation without context
-                __parser = new Parser();
-                __parser.bindParsingProvider(new JenaParserProvider());
-            }
-        }
-        return __parser;
+    protected ContentItemFactory getContentItemFactory(){
+        return ciFactory;
     }
     
     @Override
@@ -119,12 +130,27 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
                                 InputStream entityStream) throws IOException, WebApplicationException {
         //boolean withMetadata = withMetadata(httpHeaders);
         ContentItem contentItem = null;
+        UriRef contentItemId = getContentItemId();
+        if(log.isTraceEnabled()){
+            //NOTE: enabling TRACE level logging will copy the parsed content
+            //      into a BYTE array
+            log.trace("Parse ContentItem from");
+            log.trace("  - MediaType: {}",mediaType);
+            log.trace("  - Headers:");
+            for(Entry<String,List<String>> header : httpHeaders.entrySet()){
+                log.trace("      {}: {}", header.getKey(), header.getValue());
+            }
+            byte[] content = IOUtils.toByteArray(entityStream);
+            log.trace("content: \n{}", new String(content,"UTF-8"));
+            IOUtils.closeQuietly(entityStream);
+            entityStream = new ByteArrayInputStream(content);
+        }
         Set<String> parsedContentIds = new HashSet<String>();
         if(mediaType.isCompatible(MULTIPART)){
+            log.debug(" - parse Multipart MIME ContentItem");
             //try to read ContentItem from "multipart/from-data"
             MGraph metadata = null;
             FileItemIterator fileItemIterator;
-            String contentItemId = null;
             try {
                 fileItemIterator = fu.getItemIterator(new MessageBodyReaderContext(entityStream, mediaType));
                 while(fileItemIterator.hasNext()){
@@ -138,8 +164,9 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
                                 		"'content'!").build());
                         }
                         //the metadata may define the ID for the contentItem
-                        if(fis.getName() != null && !fis.getName().isEmpty()){
-                            contentItemId = fis.getName();
+                        //only used if not parsed as query param
+                        if(contentItemId == null && fis.getName() != null && !fis.getName().isEmpty()){
+                            contentItemId = new UriRef(fis.getName());
                         }
                         metadata = new IndexedMGraph();
                         try {
@@ -156,13 +183,13 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
                     } else if(fis.getFieldName().equals("content")){
                         contentItem = createContentItem(contentItemId, metadata, fis, parsedContentIds);
                     } else if(fis.getFieldName().equals("properties") ||
-                            fis.getFieldName().equals(ENHANCEMENT_PROPERTIES_URI.getUnicodeString())){
-                        //parse the enhancementProperties
+                            fis.getFieldName().equals(REQUEST_PROPERTIES_URI.getUnicodeString())){
+                        //parse the RequestProperties
                         if(contentItem == null){
                             throw new WebApplicationException(
                                 Response.status(Response.Status.BAD_REQUEST)
                                 .entity("Multipart MIME parts for " +
-                                		"EnhancementProperties MUST BE after the " +
+                                		"Request Properties MUST BE after the " +
                                 		"MIME parts for 'metadata' AND 'content'")
                                 .build());
                         }
@@ -170,7 +197,7 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
                         if(!APPLICATION_JSON_TYPE.isCompatible(propMediaType)){
                             throw new WebApplicationException(
                                 Response.status(Response.Status.BAD_REQUEST)
-                                .entity("EnhancementProperties (Multipart MIME parts" +
+                                .entity("Request Properties (Multipart MIME parts" +
                                 		"with the name '"+fis.getFieldName()+"') MUST " +
                                 		"BE encoded as 'appicaltion/json' (encountered: '" +
                                 		fis.getContentType()+"')!")
@@ -180,14 +207,15 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
                         if(propCharset == null){
                             propCharset = "UTF-8";
                         }
-                        Map<String,Object> enhancementProperties = getEnhancementProperties(contentItem); 
+                        Map<String,Object> reqProp = 
+                                ContentItemHelper.initRequestPropertiesContentPart(contentItem); 
                         try {
-                            enhancementProperties.putAll(toMap(new JSONObject(
+                            reqProp.putAll(toMap(new JSONObject(
                                 IOUtils.toString(fis.openStream(),propCharset))));
                         } catch (JSONException e) {
                             throw new WebApplicationException(e,
                                 Response.status(Response.Status.BAD_REQUEST)
-                                .entity("Unable to parse EnhancementProperties from" +
+                                .entity("Unable to parse Request Properties from" +
                                 		"Multipart MIME parts with the name 'properties'!")
                                 .build());
                         }
@@ -237,16 +265,128 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
                 throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
             }
         } else { //normal content
-            contentItem = new InMemoryContentItem(
-                IOUtils.toByteArray(entityStream), mediaType.toString());
+            ContentItemFactory ciFactory = getContentItemFactory();
+            contentItem = ciFactory.createContentItem(contentItemId,
+                new StreamSource(entityStream, mediaType.toString()));
             //add the URI of the main content
             parsedContentIds.add(contentItem.getPartUri(0).getUnicodeString());
         }
         //set the parsed contentIDs to the EnhancementProperties
-        getEnhancementProperties(contentItem).put(PARSED_CONTENT_URIS, 
-            Collections.unmodifiableSet(parsedContentIds));
+        Map<String,Object> ep = ContentItemHelper.initRequestPropertiesContentPart(contentItem);
+        parseEnhancementPropertiesFromParameters(ep);
+        ep.put(PARSED_CONTENT_URIS, Collections.unmodifiableSet(parsedContentIds));
+        
+        //STANBOL-660: set the language of the content if explicitly parsed in the request
+        String contentLanguage = getContentLanguage();
+        if(!StringUtils.isBlank(contentLanguage)){
+            EnhancementEngineHelper.set(contentItem.getMetadata(), contentItem.getUri(), 
+                DC_LANGUAGE, new PlainLiteralImpl(contentLanguage));
+        }
         return contentItem;
     }
+    /**
+     * tries to retrieve the ContentItem from the 'uri' query parameter of the
+     * {@link #request}.
+     * @return the parsed URI or <code>null</code> if none
+     */
+    private UriRef getContentItemId() {
+        //NOTE: check for request NULL is needed because of unit tests
+        if (uriInfo == null) return null;
+        URI uri = uriInfo.getRequestUri();
+        String query = uri.getQuery();
+        log.debug("parse ContentItem ID from URI: {}",uri);
+        //TODO: workaround for uriInfo.getPathParameters() not working as expected
+        //MultivaluedMap<String,String> params = uriInfo.getPathParameters();
+        //final String ciUri = params.getFirst("uri");
+        String ciUri = null; //parse the uri parameter manually from the request URI
+        if(query != null){
+            int index = query.indexOf("uri=");
+            if(index >= 0){
+               index = index+4; //add "uri=".length
+               int endIndex = query.indexOf('&', index);
+               if(endIndex <= index){
+                   endIndex = query.length();
+               }
+               if(index < endIndex){
+                   try {
+                    ciUri = URLDecoder.decode(query.substring(index, endIndex), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new IllegalStateException(e); //should never happen
+                }
+               }
+            }
+        }
+        if(ciUri != null){
+            try { //validate the parsed URI
+                new URI(ciUri);
+            } catch (URISyntaxException e) {
+               throw new WebApplicationException("The parsed ContentItem URI '"
+                       + ciUri +"' is not a valid URI. Please check the value "
+                       + "of the 'uri' parameter",Response.Status.BAD_REQUEST);
+            }
+        }
+        return ciUri == null ? null : new UriRef(ciUri);
+    }
+    /**
+     * Getter for the <code>Content-Language</code> header
+     * @return the language of the content as parsed in the request or 
+     * <code>null</code> if the header is not present.
+     */
+    private String getContentLanguage(){
+        if(headers != null){
+        	List<String> languages = headers.getRequestHeader(HttpHeaders.CONTENT_LANGUAGE);
+        	if(languages != null && !languages.isEmpty()){
+        		if(languages.size() > 1){
+        			log.warn(" ... only single valued Content-Language headers are "
+        					+ "supported (will use first language of {})", languages);
+        		}
+        		return languages.get(0);
+        	} else {
+        		return null;
+        	}
+        } else {
+        	return null;
+        }
+    }
+    
+    /**
+     * Parsed EnhancementProperties from the request parameters. <p>
+     * This does NOT override existing values in the parsed map.
+     * @param ep the map to add the properties
+     */
+    private void parseEnhancementPropertiesFromParameters(Map<String,Object> ep){
+        if(uriInfo == null) {
+            return; //for unit tests
+        }
+        MultivaluedMap<String,String> parameters = uriInfo.getQueryParameters();
+        log.debug("read EnhancementPropertis from Request Parameters:");
+        for(Entry<String,List<String>> entry : parameters.entrySet()){
+            if(entry.getKey().contains("enhancer.")){
+                if(!ep.containsKey(entry.getKey())){
+                    log.debug(" + {}",entry.getKey());
+                    Object value;
+                    if(entry.getValue() == null || entry.getValue().isEmpty()){
+                        value = null;
+                    } if(entry.getValue().size() == 1){
+                        value = entry.getValue().get(0);
+                    } else {
+                    	//we do want our own read-only copy!
+                        value = Collections.unmodifiableList(
+                        		new ArrayList<String>(entry.getValue()));
+                    }
+                    log.debug("      value: {}", value);
+                    ep.put(entry.getKey(), value);
+                } else if(log.isDebugEnabled()){
+                    log.debug(" - ignore key {} because it is already present");
+                    log.debug("   current value: {}",ep.get(entry.getKey()));
+                    log.debug("   request value: {} (ignored)", entry.getValue());
+                }
+            } else {
+                log.debug(" - {}", entry.getKey());
+            }
+        }
+    }
+    
     /**
      * Creates a ContentItem
      * @param id the ID or <code>null</code> if not known
@@ -264,12 +404,14 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
      * @throws IOException on any error while accessing the contents of the parsed
      * {@link FileItemStream}
      * @throws FileUploadException if the parsed contents are not correctly
-     * encoded Multipoart MIME
+     * encoded Multipart MIME
      */
-    private ContentItem createContentItem(String id, MGraph metadata, FileItemStream content,Set<String> parsedContentParts) throws IOException, FileUploadException {
+    private ContentItem createContentItem(UriRef id, MGraph metadata, FileItemStream content,Set<String> parsedContentParts) throws IOException, FileUploadException {
         MediaType partContentType = MediaType.valueOf(content.getContentType());
         ContentItem contentItem = null;
+        ContentItemFactory ciFactory = getContentItemFactory();
         if(MULTIPART.isCompatible(partContentType)){
+            log.debug("  - multiple (alternate) ContentParts"); 
             //multiple contentParts are parsed
             FileItemIterator contentPartIterator = fu.getItemIterator(
                 new MessageBodyReaderContext(
@@ -277,13 +419,14 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
             while(contentPartIterator.hasNext()){
                 FileItemStream fis = contentPartIterator.next();
                 if(contentItem == null){
-                    log.debug("create ContentItem {} for content (type:{})",
-                        id,content.getContentType());
-                    contentItem = new InMemoryContentItem(id, 
-                        IOUtils.toByteArray(fis.openStream()),
-                        fis.getContentType(), metadata);
+                    log.debug("  - create ContentItem {} for content (type:{})",
+                        id,fis.getContentType());
+                    contentItem = ciFactory.createContentItem(id,
+                        new StreamSource(fis.openStream(),fis.getContentType()), 
+                        metadata);
                 } else {
-                    Blob blob = new InMemoryBlob(fis.openStream(), fis.getContentType());
+                    log.debug("  - create Blob for content (type:{})", fis.getContentType());
+                    Blob blob = ciFactory.createBlob(new StreamSource(fis.openStream(), fis.getContentType()));
                     UriRef contentPartId = null;
                     if(fis.getFieldName() != null && !fis.getFieldName().isEmpty()){
                         contentPartId = new UriRef(fis.getFieldName());
@@ -292,18 +435,18 @@ public class ContentItemReader implements MessageBodyReader<ContentItem> {
                         //TODO maybe we should throw an exception instead
                         contentPartId = new UriRef("urn:contentpart:"+ randomUUID());
                     }
-                    log.debug("  ... add Blob {} to ContentItem {} with content (type:{})",
+                    log.debug("    ... add Blob {} to ContentItem {} with content (type:{})",
                         new Object[]{contentPartId, id, fis.getContentType()});
                     contentItem.addPart(contentPartId, blob);
                     parsedContentParts.add(contentPartId.getUnicodeString());
                 }
             }
         } else {
-            log.debug("create ContentItem {} for content (type:{})",
+            log.debug("  - create ContentItem {} for content (type:{})",
                 id,content.getContentType());
-            contentItem = new InMemoryContentItem(id, 
-                IOUtils.toByteArray(content.openStream()),
-                content.getContentType(), metadata);
+            contentItem = ciFactory.createContentItem(id,
+                new StreamSource(content.openStream(),content.getContentType()), 
+                metadata);
         }
         //add the URI of the main content to the parsed contentParts
         parsedContentParts.add(contentItem.getPartUri(0).getUnicodeString());

@@ -16,21 +16,20 @@
 -->
 <#import "/imports/common.ftl" as common>
 <#escape x as x?html>
-<@common.page title="Apache Stanbol Flow" hasrestapi=true>
+<@common.page title="Apache Stanbol Enhancer" hasrestapi=true>
 
 
 <div class="panel" id="webview">
-	<h3> Web View and REST API have to be documented</h3>
-<#--  <#include "/imports/enhancerweb.ftl"> -->
+  <#include "/imports/enhancerweb.ftl">
 </div>
 
 <div class="panel" id="restapi" style="display: none;">
-	<h3> REST API documentation have to be done</h3>
+
     <#-- 1. Documentation of the normal RESTful API -->  
-<#--    <#include "/imports/doc/enhancerbase.ftl"> -->
+    <#include "/imports/doc/enhancerbase.ftl">
   
     <#-- 2. Documentation of Enhancer Configuration RESTful API -->  
-<#--    <h3>Enhancer Configuration</h3>
+    <h3>Enhancer Configuration</h3>
     
     <p> GET requests with an accept header of any supported RDF serialisation 
     such as
@@ -73,12 +72,12 @@
     
     <p>In addition there is aleo a <a href="${it.publicBaseUri}enhancer/sparql">
     SPARQL Endpoint</a> that allows to query the configuration</p>
--->
+
     <#-- 3. Documentation of the multipart ContentItem RESTful API -->  
-<#--    <#include "/imports/doc/multipartcontentitem.ftl"> -->
+    <#include "/imports/doc/multipartcontentitem.ftl">
     
     <#-- 5. Documentation of the ExecutionPlan RESTful API -->  
-<#--    <#include "/imports/doc/executionplan.ftl"> -->
+    <#include "/imports/doc/executionplan.ftl">
     
 </div>
 

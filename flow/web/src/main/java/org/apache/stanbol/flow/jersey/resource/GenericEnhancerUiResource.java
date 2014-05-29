@@ -18,16 +18,12 @@ package org.apache.stanbol.flow.jersey.resource;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.apache.stanbol.commons.web.base.CorsHelper.addCORSOrigin;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -38,25 +34,29 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.clerezza.rdf.core.Graph;
 import org.apache.clerezza.rdf.core.NonLiteral;
 import org.apache.clerezza.rdf.core.TripleCollection;
-import org.apache.clerezza.rdf.core.access.TcManager;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
-import org.apache.stanbol.commons.web.base.ContextHelper;
+import org.apache.stanbol.commons.web.base.resource.LayoutConfiguration;
+import org.apache.stanbol.commons.web.viewable.Viewable;
 import org.apache.stanbol.enhancer.servicesapi.Chain;
 import org.apache.stanbol.enhancer.servicesapi.ChainException;
+import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
+import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
+import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
+import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.enhancer.servicesapi.helper.ExecutionPlanHelper;
-import org.apache.stanbol.enhancer.servicesapi.helper.InMemoryContentItem;
+import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.view.Viewable;
 
 /**
  * Abstract super class for all Enhancer endpoint that do also provide the
@@ -66,19 +66,29 @@ import com.sun.jersey.api.view.Viewable;
  * @author Rupert Westenthaler
  *
  */
-public abstract class AbstractEnhancerUiResource extends AbstractEnhancerResource {
+public class GenericEnhancerUiResource extends AbstractEnhancerResource {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    protected final TcManager tcManager;
+    /**
+     * Optional dependency - might be <code>null</code>
+     */
+    //protected QueryEngine queryEngine;
     protected final Serializer serializer;
-    private LinkedHashSet<ExecutionNode> _executionNodes;
-    private LinkedHashSet<ExecutionNode> _activeNodes;
+    private Set<ExecutionNode> _executionNodes;
+    private Set<ExecutionNode> _activeNodes;
     protected final Chain chain;
-
-    public AbstractEnhancerUiResource(String chainName,ServletContext context) {
-        super(context);
-        serializer = ContextHelper.getServiceFromContext(Serializer.class, context);
-        tcManager = ContextHelper.getServiceFromContext(TcManager.class, context);
+    
+    public GenericEnhancerUiResource(String chainName,
+            FlowJobManager jobManager, 
+            EnhancementEngineManager engineManager, 
+            ChainManager chainManager, 
+            ContentItemFactory ciFactory,
+            Serializer serializer, 
+            LayoutConfiguration layoutConfiguration, 
+            UriInfo uriInfo) {
+        super(jobManager, engineManager, chainManager, ciFactory, layoutConfiguration, uriInfo);
+        this.serializer = serializer;
+        //this.queryEngine = queryEngine;
         if(chainName == null){
             chain = chainManager.getDefault();
         } else {
@@ -92,8 +102,8 @@ public abstract class AbstractEnhancerUiResource extends AbstractEnhancerResourc
     @GET
     @Produces(TEXT_HTML)
     public Response get(@Context HttpHeaders headers) {
-        ResponseBuilder res = Response.ok(new Viewable("index", this), TEXT_HTML);
-        addCORSOrigin(servletContext, res, headers);
+        ResponseBuilder res = Response.ok(new Viewable("index", this, GenericEnhancerUiResource.class), TEXT_HTML);
+//        addCORSOrigin(servletContext, res, headers);
         return res.build();
     }
 
@@ -110,21 +120,30 @@ public abstract class AbstractEnhancerUiResource extends AbstractEnhancerResourc
      */
     @POST
     @Consumes(APPLICATION_FORM_URLENCODED)
-    public Response enhanceFromForm(@FormParam("content") String content, @FormParam("format") String format, @FormParam("ajax") boolean buildAjaxview, @Context HttpHeaders headers) throws EnhancementException,
-                                                                                      IOException {
+    public Response enhanceFromForm(@FormParam("content") String content, 
+                                    @FormParam("format") String format, 
+                                    @FormParam("ajax") boolean buildAjaxview, 
+                                    @Context HttpHeaders headers) throws EnhancementException,
+                                                                         IOException {
         log.info("enhance from From: " + content);
-        ContentItem ci = new InMemoryContentItem(content.getBytes("UTF-8"), TEXT_PLAIN);
+        ContentItem ci = ciFactory.createContentItem(new StringSource(content));
         if(!buildAjaxview){ //rewrite to a normal EnhancementRequest
-            return enhanceFromData(ci, null, false, null, false, null, false, null, headers);
+            return enhanceFromData(ci, false, null, false, null, false, null, headers);
         } else { //enhance and build the AJAX response
-            enhance(ci);
-            ContentItemResource contentItemResource = new ContentItemResource(null, ci, uriInfo, "",
-                    tcManager, serializer, servletContext);
+            EnhancementException enhancementException;
+            try {
+                enhance(ci, null);
+                enhancementException = null;
+            } catch (EnhancementException e){
+                enhancementException = e;
+            }
+            ContentItemResource contentItemResource = new ContentItemResource(null, ci, getUriInfo(), "",
+                    serializer, getLayoutConfiguration(), enhancementException);
             contentItemResource.setRdfSerializationFormat(format);
-            Viewable ajaxView = new Viewable("/ajax/contentitem", contentItemResource);
+            Viewable ajaxView = new Viewable("/ajax/contentitem", contentItemResource, ContentItemResource.class);
             ResponseBuilder rb = Response.ok(ajaxView);
             rb.header(HttpHeaders.CONTENT_TYPE, TEXT_HTML + "; charset=UTF-8");
-            addCORSOrigin(servletContext, rb, headers);
+            //addCORSOrigin(servletContext, rb, headers);
             return rb.build();
         }
     }
@@ -134,7 +153,7 @@ public abstract class AbstractEnhancerUiResource extends AbstractEnhancerResourc
     }
 
     public String getServiceUrl() {
-        String uri = uriInfo.getAbsolutePath().toString();
+        String uri = getUriInfo().getAbsolutePath().toString();
         return uri.charAt(uri.length()-1) == '/' ?
             uri.substring(0, uri.length()-1) : uri;
     }
