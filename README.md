@@ -22,7 +22,7 @@
 
 # Starting Stanbol 
 
-    $ cd flow/fullflow/target ; java -jar org.apache.stanbol.launchers.fullflow-0.9.0-incubating.jar;
+    $ cd flow/fullflow/target ; java -jar org.apache.stanbol.launchers.fullflow-1.0.0-SNAPSHOT.jar;
 
 # Testing Flow :
 
@@ -36,16 +36,8 @@ The flow endpoint offer sub-ressource that allow you to directly call some prede
 
 Template for this request is : 
 
-    $ curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" --data "Here comes a little test with Paris as content and also Berlin but why not detect city as Boston and some well know people like Bob Marley." http://localhost:8080/flow/{{flowName}}
+    $ curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" --data "content=Here comes a little test with Paris as content and also Berlin but why not detect city as Boston and some well know people like Bob Marley." http://localhost:8080/flow
 
-Where {{flowName}} can have the values : 
+Flow/Route definition for default can be find here : https://github.com/adperezmorales/stanbol-camel-workflow/blob/master/flow/weightedgraphflow/src/main/java/org/apache/stanbol/flow/weightedgraphflow/WeightedChain.java
 
-   - default : default chain : all registred engines sorted by weight
-   - tika : only call tika engine, no visible result (as the engine don't create enhancements)
-   - tika2 : tika then langID then NER then save the result in /tmp/chainoutput folder
-   - tika-default : tika then default flow
-
-Flow/Route definition for default can be find here : https://svn.apache.org/repos/asf/incubator/stanbol/branches/cameltrial/flow/weightedgraphflow/src/main/java/org/apache/stanbol/flow/weightedgraphflow/WeightedChain.java
-
-Others Flow/routes definition resides here : https://svn.apache.org/repos/asf/incubator/stanbol/branches/cameltrial/flow/filepoolgraphflow/src/main/java/org/apache/stanbol/flow/filepoolgraphflow/FileRoute.java
 
