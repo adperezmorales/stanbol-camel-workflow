@@ -29,6 +29,7 @@ import static org.apache.stanbol.flow.jersey.utils.EnhancerUtils.addActiveEngine
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -52,7 +53,6 @@ import org.apache.stanbol.commons.web.base.resource.LayoutConfiguration;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
-import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.enhancer.servicesapi.rdf.Enhancer;
 
@@ -88,7 +88,24 @@ public final class FlowRootResource extends BaseStanbolResource {
                 chainManager, ciFactory, serializer, getLayoutConfiguration(),
                 getUriInfo());
     }
-            
+    
+    /**
+     * <p>Call a specific flow graph using the chain name</p>
+     * <p>So, we use the chain name to see if there is a chain with this name, but internally the component
+     * will call the direct Camel endpoint with that name</p>
+     * <p>So it os mandatory to deploy a route with such name along with specify a new chain with that name</p>
+     * <p>It needs to be improved</p>
+     * 
+     * @param flowGraph
+     * @return a {@code GenericEnhancerUiResource} instance
+     */
+    @Path("{flowGraph}")
+    public GenericEnhancerUiResource get(@PathParam(value = "flowGraph") String flowGraph) {
+        return new GenericEnhancerUiResource(flowGraph, jobManager, 
+                engineManager, chainManager, ciFactory, serializer, 
+                getLayoutConfiguration(), getUriInfo());
+    }
+    
     public class EnhancerResource extends GenericEnhancerUiResource {
         public EnhancerResource(
             FlowJobManager jobManager, 
