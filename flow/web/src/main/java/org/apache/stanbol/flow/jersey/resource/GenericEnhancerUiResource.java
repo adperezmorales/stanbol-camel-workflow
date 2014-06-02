@@ -92,7 +92,7 @@ public class GenericEnhancerUiResource extends AbstractEnhancerResource {
         if(chainName == null){
             chain = chainManager.getDefault();
         } else {
-            this.chain = chainManager.getChain(chainName);
+            this.chain = new CamelChain(chainName);
         }
         if(this.chain == null){
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -257,5 +257,40 @@ public class GenericEnhancerUiResource extends AbstractEnhancerResource {
         public boolean equals(Object o) {
             return o instanceof ExecutionNode && ((ExecutionNode) o).node.equals(node);
         }
+    }
+    
+    /**
+     * <p>Class representing a Chain for Camel</p>
+     * <p>Only the name will be used because the engines are specified in the route which
+     * has to be already deployed</p>
+     * @author Antonio David Perez Morales <adperezmorales@gmail.com>
+     *
+     */
+    private static class CamelChain implements Chain {
+
+    	/**
+    	 * Chain name
+    	 */
+    	private String name;
+    	
+    	public CamelChain(String chainName) {
+    		this.name = chainName;
+    	}
+    	
+		@Override
+		public Graph getExecutionPlan() throws ChainException {
+			return null;
+		}
+
+		@Override
+		public Set<String> getEngines() throws ChainException {
+			return null;
+		}
+
+		@Override
+		public String getName() {
+			return this.name;
+		}
+    	
     }
 }
