@@ -59,6 +59,15 @@
   		</bundle>
   </startLevel>
   
+  <!-- Route installer custom artifact, to deploy routes defined in .route files using Felix Fileinstall component -->
+  <startLevel level="33">
+  		<bundle>
+  			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.flow.artifact.route</artifactId>
+			<version>1.0.0-SNAPSHOT</version> 
+		</bundle>
+  </startLevel>
+  
   <!-- Stanbol Enhancer plug-ins (the Enhancement Engines) -->
   <startLevel level="35">
 	
