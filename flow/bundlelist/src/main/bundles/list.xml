@@ -50,7 +50,15 @@
 		</bundle>
 	</startLevel>
 
-	
+  <!-- Felix FileInstall to deploy custom artifacts -->
+  <startLevel level="32">
+  		<bundle>
+  			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.fileinstall</artifactId>
+			<version>3.4.0</version>
+  		</bundle>
+  </startLevel>
+  
   <!-- Stanbol Enhancer plug-ins (the Enhancement Engines) -->
   <startLevel level="35">
 	
