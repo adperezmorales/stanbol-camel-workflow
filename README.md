@@ -18,14 +18,14 @@
 # Building Flow endpoint
 
     $ cd flow/ ; mvn clean install;
-    $ cd felix-fileinstall-route-artifact/ ; mvn clean install; # Used to deploy routes placing a file with ***route*** extension in some directory
+    $ cd felix-fileinstall-route-artifact/ ; mvn clean install; # Used to deploy routes placing a file with 'route' extension in some directory
     $ cd launchers/fullflow ; mvn clean install;
 
 # Starting Stanbol
 
     $ cd flow/fullflow/target ; java -jar org.apache.stanbol.launchers.fullflow-1.0.0-SNAPSHOT.jar;
 
-    If you want to deploy Camel routes defined in XML, you have to specify the system property *felix.fileinstall.dir* pointing to the directory to be monitored. For other supported Fileinstall component properties, visit [this link](http://http://felix.apache.org/site/apache-felix-file-install.html "Apache Felix fileinstall")
+If you want to deploy Camel routes defined in XML, you have to specify the system property *felix.fileinstall.dir* pointing to the directory to be monitored. For other supported Fileinstall component properties, visit [this link](http://http://felix.apache.org/site/apache-felix-file-install.html "Apache Felix fileinstall")
 
     $ cd flow/fullflow/target : java -Dfelix.fileinstall.dir=./stanbol/fileinstall/ -jar org.apache.stanbol.launchers.fullflow-1.0.0-SNAPSHOT.jar; # In order to use the same directory used by Stanbol to deploy bundles
 
