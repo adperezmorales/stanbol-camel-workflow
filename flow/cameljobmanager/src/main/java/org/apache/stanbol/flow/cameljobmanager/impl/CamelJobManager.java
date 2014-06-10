@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.Route;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
@@ -58,13 +59,18 @@ public class CamelJobManager implements FlowJobManager {
 	}
 
 	public Boolean addRoutes(InputStream is) {
+		return addRoutes(is,null);
+	}
+	
+	public Boolean addRoutes(InputStream is, String group) {
 		try {
 			RoutesDefinition rds = cContext
 
 			.loadRoutesDefinition(is);
-
+			
 			cContext.addRouteDefinitions(rds.getRoutes());
 			for (RouteDefinition rd : rds.getRoutes()) {
+				rd.setGroup(group);
 				cContext.startRoute(rd.getId());
 			}
 
@@ -72,6 +78,30 @@ public class CamelJobManager implements FlowJobManager {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	/**
+	 * <p>Removes route by group</p>
+	 * @param group a {@code String} containing the group
+	 * @return true if any route with that group is removed or false is no route is removed
+	 */
+	public Boolean removeRoutes(String group) {
+		Boolean removed = false;
+		List<RouteDefinition> routeDefinitions = cContext.getRouteDefinitions();
+		for(final RouteDefinition rd : routeDefinitions) {
+				if(rd.getGroup() != null && rd.getGroup().equals(group)) {
+					try {
+						cContext.removeRouteDefinition(rd);
+						removed = true;
+					}
+					catch(Exception e) {
+						//Doing nothing. Silent the exception
+					}
+				}
+				
+			}
+
+		return removed;
 	}
 
 	/**
