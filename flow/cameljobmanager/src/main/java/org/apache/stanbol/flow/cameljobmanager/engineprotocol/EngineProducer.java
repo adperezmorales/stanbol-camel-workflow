@@ -22,17 +22,15 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 
 public class EngineProducer extends DefaultProducer {
-    private EngineEndpoint endpoint;
 
     public EngineProducer(EngineEndpoint endpoint) {
         super(endpoint);
-        this.endpoint = endpoint;
     }
 
     public void process(Exchange exchange) throws Exception {
     	ContentItem ci = exchange.getIn().getBody(ContentItem.class);
     	
-    	EnhancementEngine stanbolEngine = endpoint.getEngine();
+    	EnhancementEngine stanbolEngine = ((EngineEndpoint)getEndpoint()).engine;
     	
     	if (stanbolEngine.canEnhance(ci) != EnhancementEngine.CANNOT_ENHANCE){
     		stanbolEngine.computeEnhancements(ci);

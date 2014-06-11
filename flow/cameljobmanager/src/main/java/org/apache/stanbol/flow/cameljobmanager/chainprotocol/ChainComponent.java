@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.stanbol.flow.cameljobmanager.engineprotocol;
+package org.apache.stanbol.flow.cameljobmanager.chainprotocol;
 
 import java.util.Map;
 
@@ -23,35 +23,34 @@ import org.apache.camel.impl.DefaultComponent;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
-import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
+import org.apache.stanbol.enhancer.servicesapi.Chain;
+import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 
 @Component(immediate=true)
 @Service
-public class EngineComponent extends DefaultComponent {
+public class ChainComponent extends DefaultComponent {
 	
 	@Reference
-	EnhancementEngineManager manager;
-	   
-    
-	public EnhancementEngineManager getEnhancementEngineManager() {
+	ChainManager manager;
+	
+	public ChainManager getManager() {
 		return manager;
 	}
 
-	public void setEnhancementEngineManager(EnhancementEngineManager manager) {
+	public void setChainManager(ChainManager manager) {
 		this.manager = manager;
 	}
 
 	protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
 
     	Endpoint endpoint = null;
-    	EnhancementEngine e = manager.getEngine(remaining);
+    	Chain chain = manager.getChain(remaining);
     	
-    	if (e != null){
-    		endpoint = new EngineEndpoint(remaining, this, e);
+    	if (chain != null){
+    		endpoint = new ChainEndpoint(remaining, this, chain);
     	}
     	else{ 
-    		throw new IllegalArgumentException("No registered engine referenced by this name : " + remaining);
+    		throw new IllegalArgumentException("No registered chain referenced by this name : " + remaining);
     	}
     	
         setProperties(endpoint, parameters);

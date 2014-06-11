@@ -23,7 +23,8 @@ import org.apache.camel.impl.ScheduledPollConsumer;
  * The Engine consumer.
  */
 public class EngineConsumer extends ScheduledPollConsumer {
-    private final EngineEndpoint endpoint;
+    
+	final EngineEndpoint endpoint;
 
     public EngineConsumer(EngineEndpoint endpoint, Processor processor) {
         super(endpoint, processor);

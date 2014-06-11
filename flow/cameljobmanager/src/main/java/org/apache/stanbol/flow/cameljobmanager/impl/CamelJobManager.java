@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.Route;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
@@ -46,7 +45,7 @@ public class CamelJobManager implements FlowJobManager {
 
 	EngineComponent ec;
 
-	private static final Logger LOG = LoggerFactory
+	private static final Logger logger = LoggerFactory
 			.getLogger(CamelJobManager.class);
 	private CamelContext cContext = null;
 
@@ -168,7 +167,7 @@ public class CamelJobManager implements FlowJobManager {
 	}
 
 	public List<EnhancementEngine> getActiveEngines() {
-		return ec.getEnhancementEngines();
+		return null;
 	}
 
 	private void addRouteToContext(RouteBuilder rb) throws Exception {

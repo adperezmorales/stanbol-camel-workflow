@@ -25,25 +25,25 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 
 public class EngineEndpoint extends DefaultEndpoint {
 	
-	private EnhancementEngine engine;
+	final EnhancementEngine engine;
     	
 	public EngineEndpoint(String uri, EngineComponent component, EnhancementEngine e) {
         super(uri, component);
         this.engine = e;
     }
 
-	public EnhancementEngine getEngine(){
-		return engine;
-	}
-    public Producer createProducer() throws Exception {
+	@Override
+	public Producer createProducer() throws Exception {
         return new EngineProducer(this);
     }
     
+    @Override
     public Consumer createConsumer(Processor processor) throws Exception {
     	throw new UnsupportedOperationException("You cannot get messages from this endpoint: " + getEndpointUri());
     }
 
+    @Override
     public boolean isSingleton() {
-        return true;
+        return false;
     }
 }
