@@ -94,7 +94,7 @@
 							org.apache.stanbol.flow.cameljobmanager.impl,
 							*
 						</Import-Package>
-						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Vendor>The
 							Apache Software Foundation</Bundle-Vendor>
 						<Bundle-DocURL>
@@ -132,7 +132,7 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-scr-plugin</artifactId>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>rat-maven-plugin</artifactId>
 				<configuration>
@@ -146,7 +146,7 @@
 						<param>.externalToolBuilders/*</param>
 					</excludes>
 				</configuration>
-			</plugin>
+			</plugin> -->
 		</plugins>
 	</build>
 </project>

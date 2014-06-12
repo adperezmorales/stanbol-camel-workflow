@@ -41,7 +41,7 @@
 
 	<!-- Modules -->
 	<modules>
-		<module>archetype/routebuilder</module>
+		<module>archetype</module>
 		<module>servicesapi</module>
 		<module>web</module>
 		<module>cameljobmanager</module>
