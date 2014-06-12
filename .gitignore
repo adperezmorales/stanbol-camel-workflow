@@ -6,3 +6,7 @@ target
 *~
 */target/**
 **/target/**
+installer/routeprovider/bin/nbactions.xml
+installer/routeprovider/bin/pom.xml
+installer/routeprovider/bin/src/main/assembly/felix.xml
+installer/routeprovider/bin/src/main/java/org/apache/stanbol/flow/artifact/route/RouteInstaller.class
