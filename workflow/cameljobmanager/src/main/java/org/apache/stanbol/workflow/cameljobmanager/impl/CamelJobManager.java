@@ -1,4 +1,4 @@
-package org.apache.stanbol.flow.cameljobmanager.impl;
+package org.apache.stanbol.workflow.cameljobmanager.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
-import org.apache.stanbol.flow.cameljobmanager.engineprotocol.EngineComponent;
+import org.apache.stanbol.workflow.cameljobmanager.engineprotocol.EngineComponent;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.apache.stanbol.flow.cameljobmanager.chainprotocol;
+package org.apache.stanbol.workflow.cameljobmanager.chainprotocol;
 
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;

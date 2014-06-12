@@ -1,4 +1,4 @@
-package org.apache.stanbol.flow.cameljobmanager.converter;
+package org.apache.stanbol.workflow.cameljobmanager.converter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

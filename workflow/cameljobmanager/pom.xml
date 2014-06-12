@@ -138,10 +138,11 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>org.apache.stanbol.flow.cameljobmanager,
-							org.apache.stanbol.flow.cameljobmanager.converter,
-							org.apache.stanbol.flow.cameljobmanager.impl,
-							org.apache.stanbol.flow.cameljobmanager.engineprotocol</Export-Package>
+						<Export-Package>org.apache.stanbol.workflow.cameljobmanager,
+							org.apache.stanbol.workflow.cameljobmanager.converter,
+							org.apache.stanbol.workflow.cameljobmanager.impl,
+							org.apache.stanbol.workflow.cameljobmanager.engineprotocol,
+							org.apache.stanbol.workflow.cameljobmanager.chainprotocol</Export-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>
