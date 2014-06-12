@@ -23,18 +23,33 @@
     <version>5-SNAPSHOT</version>
   </parent>
   
-  <groupId>stanbol-camel-workflow</groupId>
-  <artifactId>stanbol-camel-workflow</artifactId>
+  <artifactId>stanbol-camel-workflow-reactor</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Stanbol Camel Workflow</name>
-  <description>Apache Stanbol Workflow Component using Apache Camel</description>
+  <name>Apache Stanbol Camel Workflow Reactor</name>
+  <description>Pseudo project to build Apache Stanbol Workflow Component using Apache Camel</description>
   
   <!-- Modules -->
   <modules>
+  	<module>workflow</module>
   	<module>installer/routeprovider</module> <!-- Sling installer plugin for routes -->
   	<module>launchers/fullflow</module> <!--  Custom launcher -->
-  	<module>workflow</module>
   </modules>
   
+  <!--  Dependency Management -->
+  <dependencyManagement>
+		<dependencies>
+			<!-- Stanbol Workflow Dependenciess -->
+			<dependency>
+				<groupId>org.apache.stanbol</groupId>
+				<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.stanbol</groupId>
+				<artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

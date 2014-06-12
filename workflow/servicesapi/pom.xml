@@ -22,12 +22,12 @@
 
 	<parent>
 		<groupId>org.apache.stanbol</groupId>
-		<artifactId>org.apache.stanbol.flow.reactor</artifactId>
+		<artifactId>apache-stanbol-workflow</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 	
-	<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
+	<artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 

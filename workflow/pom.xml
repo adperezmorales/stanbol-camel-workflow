@@ -26,33 +26,18 @@
 		<version>5-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>org.apache.stanbol.flow.reactor</artifactId>
+	<groupId>org.apache.stanbol</groupId>
+  	<artifactId>apache-stanbol-workflow</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Apache Stanbol Flow : Maven Flow Reactor</name>
-	<description>
-    Build and compile all modules from Flow implementation.
-	This module use the Apache Camel library, and bring to you the power of the "route" concept and a lot of built-in endpoints.
-	Please refer to Apache Camel website for more informations.
-  </description>
-	<inceptionYear>2014</inceptionYear>
+	<name>Apache Stanbol Workflow</name>
+  	<description>
+    	Pseudo project to build the complete Stanbol Workflow component. This module uses the Apache Camel library, and bring to you the power of the "route" concept and a lot of built-in endpoints.
+		Please refer to Apache Camel website for more informations.
+	</description>
 
-	<dependencyManagement>
-		<dependencies>
-			<!-- Stanbol Workflow Dependenciess -->
-			<dependency>
-				<groupId>org.apache.stanbol</groupId>
-				<artifactId>org.apache.stanbol.flow.cameljobmanager</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.stanbol</groupId>
-				<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<inceptionYear>2014</inceptionYear>
 
 	<!-- Modules -->
 	<modules>

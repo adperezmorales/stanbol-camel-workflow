@@ -26,12 +26,12 @@
   </parent>
 
   <groupId>org.apache.stanbol</groupId>
-  <artifactId>org.apache.stanbol.launchers.fullflow</artifactId>
+  <artifactId>org.apache.stanbol.launchers.workflow</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Apache Stanbol Launchers Full Launcher With Camel</name>
-  <description>Runnable jar that runs the full Stanbol configuration with Camel</description>
+  <name>Apache Stanbol Launchers Workflow Launcher</name>
+  <description>Runnable jar that runs the full Stanbol configuration with Workflow support</description>
 
   <build>
     <plugins>
@@ -303,7 +303,7 @@
     <!-- Stanbol Flow Bundle List -->
     <dependency>
       <groupId>org.apache.stanbol</groupId>
-      <artifactId>org.apache.stanbol.flow.bundlelist</artifactId>
+      <artifactId>org.apache.stanbol.workflow.bundlelist</artifactId>
       <version>1.0.0-SNAPSHOT</version>
       <type>partialbundlelist</type>
     </dependency>
