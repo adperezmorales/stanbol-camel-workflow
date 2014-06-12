@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 
-class=stanbolEngine.camelComponent.EngineComponent
+class=org.apache.stanbol.flow.cameljobmanager.chainprotocol.ChainComponent

@@ -30,8 +30,6 @@
 
   <description>Skeleton to create a Camel route in Java DSL</description>
 
-  <url>http://www.apache.org/stanbol-parent/org.apache.stanbol.flow.reactor/org.apache.stanbol.flow.routebuilder/</url>
-
   <licenses>
     <license>
       <name>Apache Software License, Version 2.0</name>
@@ -40,12 +38,6 @@
       <comments>A business-friendly OSS license</comments>
     </license>
   </licenses>
-
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/stanbol/trunk/parent/org.apache.stanbol.flow.reactor/org.apache.stanbol.flow.routebuilder</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/stanbol/trunk/parent/org.apache.stanbol.flow.reactor/org.apache.stanbol.flow.routebuilder</developerConnection>
-    <url>http://stanbol.apache.org/org.apache.stanbol.flow.reactor/org.apache.stanbol.flow.routebuilder/</url>
-  </scm>
 
   <distributionManagement>
     <repository>
