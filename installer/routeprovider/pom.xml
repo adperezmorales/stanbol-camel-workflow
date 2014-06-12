@@ -59,13 +59,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
@@ -77,42 +70,6 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-					<!-- org.apache.stanbol.flow.cameljobmanager;version="1.0.0-SNAPSHOT",
-							org.apache.stanbol.flow.cameljobmanager.impl;version="1.0.0-SNAPSHOT" -->
-						<Export-Package>
-							org.apache.stanbol.flow.artifact.route;version=${project.version},
-							org.apache.felix.fileinstall;version="3.4.0",
-						</Export-Package>
-						<Private-Package>
-						</Private-Package>
-						<Import-Package> org.osgi.service.log;resolution:=optional,
-							org.osgi.service.cm;resolution:=optional,
-							org.apache.felix.fileinstall,
-							org.apache.stanbol.flow.cameljobmanager,
-							org.apache.stanbol.flow.cameljobmanager.impl,
-							*
-						</Import-Package>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Vendor>The
-							Apache Software Foundation</Bundle-Vendor>
-						<Bundle-DocURL>
-						</Bundle-DocURL>
-						<_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-						<Embed-Dependency>
-						</Embed-Dependency>
-					</instructions>
-				</configuration>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>manifest</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			
 			<plugin>
