@@ -14,36 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.stanbol.flow.cameljobmanager.engineprotocol;
+package org.apache.stanbol.workflow.cameljobmanager.engineprotocol;
 
-import org.apache.camel.Consumer;
-import org.apache.camel.Processor;
-import org.apache.camel.Producer;
-import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.impl.DefaultProducer;
+import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 
+public class EngineProducer extends DefaultProducer {
 
-public class EngineEndpoint extends DefaultEndpoint {
-	
-	final EnhancementEngine engine;
+    public EngineProducer(EngineEndpoint endpoint) {
+        super(endpoint);
+    }
+
+    public void process(Exchange exchange) throws Exception {
+    	ContentItem ci = exchange.getIn().getBody(ContentItem.class);
     	
-	public EngineEndpoint(String uri, EngineComponent component, EnhancementEngine e) {
-        super(uri, component);
-        this.engine = e;
+    	EnhancementEngine stanbolEngine = ((EngineEndpoint)getEndpoint()).engine;
+    	
+    	if (stanbolEngine.canEnhance(ci) != EnhancementEngine.CANNOT_ENHANCE){
+    		stanbolEngine.computeEnhancements(ci);
+    		exchange.getIn().setBody(ci);
+    	}
+    	
     }
 
-	@Override
-	public Producer createProducer() throws Exception {
-        return new EngineProducer(this);
-    }
-    
-    @Override
-    public Consumer createConsumer(Processor processor) throws Exception {
-    	throw new UnsupportedOperationException("You cannot get messages from this endpoint: " + getEndpointUri());
-    }
-
-    @Override
-    public boolean isSingleton() {
-        return false;
-    }
 }

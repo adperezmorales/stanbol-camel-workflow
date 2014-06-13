@@ -1,4 +1,4 @@
-package org.apache.stanbol.flow.cameljobmanager.chainprotocol;
+package org.apache.stanbol.workflow.cameljobmanager.chainprotocol;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;

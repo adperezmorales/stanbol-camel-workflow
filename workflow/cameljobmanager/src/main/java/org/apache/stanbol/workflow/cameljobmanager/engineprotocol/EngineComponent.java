@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.stanbol.flow.cameljobmanager.engineprotocol;
+package org.apache.stanbol.workflow.cameljobmanager.engineprotocol;
 
 import java.util.Map;
 
