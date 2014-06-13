@@ -27,12 +27,8 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
-<<<<<<< HEAD:workflow/cameljobmanager/src/main/java/org/apache/stanbol/flow/cameljobmanager/impl/CamelJobManager.java
-import org.apache.stanbol.flow.cameljobmanager.chainprotocol.ChainComponent;
-import org.apache.stanbol.flow.cameljobmanager.engineprotocol.EngineComponent;
-=======
+import org.apache.stanbol.workflow.cameljobmanager.chainprotocol.ChainComponent;
 import org.apache.stanbol.workflow.cameljobmanager.engineprotocol.EngineComponent;
->>>>>>> 61d5d2d54c51698fc2f8c5a25a05f927b9d7b4e9:workflow/cameljobmanager/src/main/java/org/apache/stanbol/workflow/cameljobmanager/impl/CamelJobManager.java
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

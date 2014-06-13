@@ -10,6 +10,7 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
 public class ChainEndpoint extends DefaultEndpoint {
 	
 	final Chain chain;
+	
 	final EnhancementJobManager jobManager;
 	
 	public ChainEndpoint(String uri, ChainComponent component, Chain chain, EnhancementJobManager jobManager) {

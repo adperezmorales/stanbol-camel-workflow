@@ -37,6 +37,7 @@ public class ChainComponent extends DefaultComponent {
 	
 	@Reference
 	ChainManager manager;
+	
 	@Reference
 	private EnhancementJobManager jobManager;
 	

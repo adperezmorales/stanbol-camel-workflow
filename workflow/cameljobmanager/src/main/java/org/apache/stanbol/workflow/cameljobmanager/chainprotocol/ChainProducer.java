@@ -19,8 +19,8 @@ public class ChainProducer extends DefaultProducer {
 		ContentItem ci = exchange.getIn().getBody(ContentItem.class);
     	
     	Chain chain = ((ChainEndpoint)getEndpoint()).chain;
-    	
-    	((ChainEndpoint)getEndpoint()).jobManager.enhanceContent(ci, chain);
+    	EnhancementJobManager jobManager = ((ChainEndpoint)getEndpoint()).jobManager;
+    	jobManager.enhanceContent(ci, chain);
     	exchange.getIn().setBody(ci);
 	}
 
