@@ -2,6 +2,7 @@ package org.apache.stanbol.flow.cameljobmanager.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -26,6 +27,7 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
+import org.apache.stanbol.flow.cameljobmanager.chainprotocol.ChainComponent;
 import org.apache.stanbol.flow.cameljobmanager.engineprotocol.EngineComponent;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -36,14 +38,14 @@ import org.slf4j.LoggerFactory;
  * memory.
  * 
  */
-@org.apache.felix.scr.annotations.Component(immediate = true)
+@org.apache.felix.scr.annotations.Component(immediate = true, metatype = false)
 @Service(FlowJobManager.class)
 @References({
-		@Reference(referenceInterface = Component.class, name = "Ec", policy = ReferencePolicy.DYNAMIC),
+		@Reference(referenceInterface = Component.class, name = "CamelComponent", policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE),
 		@Reference(referenceInterface = RoutesBuilder.class, name = "Route", cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC) })
 public class CamelJobManager implements FlowJobManager {
 
-	EngineComponent ec;
+	List<Component> camelComponents = new ArrayList();
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(CamelJobManager.class);
@@ -58,15 +60,15 @@ public class CamelJobManager implements FlowJobManager {
 	}
 
 	public Boolean addRoutes(InputStream is) {
-		return addRoutes(is,null);
+		return addRoutes(is, null);
 	}
-	
+
 	public Boolean addRoutes(InputStream is, String group) {
 		try {
 			RoutesDefinition rds = cContext
 
 			.loadRoutesDefinition(is);
-			
+
 			cContext.addRouteDefinitions(rds.getRoutes());
 			for (RouteDefinition rd : rds.getRoutes()) {
 				rd.setGroup(group);
@@ -78,27 +80,31 @@ public class CamelJobManager implements FlowJobManager {
 			return false;
 		}
 	}
-	
+
 	/**
-	 * <p>Removes route by group</p>
-	 * @param group a {@code String} containing the group
-	 * @return true if any route with that group is removed or false is no route is removed
+	 * <p>
+	 * Removes route by group
+	 * </p>
+	 * 
+	 * @param group
+	 *            a {@code String} containing the group
+	 * @return true if any route with that group is removed or false is no route
+	 *         is removed
 	 */
 	public Boolean removeRoutes(String group) {
 		Boolean removed = false;
 		List<RouteDefinition> routeDefinitions = cContext.getRouteDefinitions();
-		for(final RouteDefinition rd : routeDefinitions) {
-				if(rd.getGroup() != null && rd.getGroup().equals(group)) {
-					try {
-						cContext.removeRouteDefinition(rd);
-						removed = true;
-					}
-					catch(Exception e) {
-						//Doing nothing. Silent the exception
-					}
+		for (final RouteDefinition rd : routeDefinitions) {
+			if (rd.getGroup() != null && rd.getGroup().equals(group)) {
+				try {
+					cContext.removeRouteDefinition(rd);
+					removed = true;
+				} catch (Exception e) {
+					// Doing nothing. Silent the exception
 				}
-				
 			}
+
+		}
 
 		return removed;
 	}
@@ -118,12 +124,14 @@ public class CamelJobManager implements FlowJobManager {
 		}
 	}
 
-	protected void bindEc(Component e) {
-		ec = (EngineComponent) e;
+	protected void bindCamelComponent(Component e) {
+		camelComponents.add(e);
+		registerComponent(e);
 	}
 
-	protected void unbindEc(Component e) {
-		ec = null;
+	protected void unbindCamelComponent(Component e) {
+		camelComponents.remove(e);
+		unregisterComponent(e);
 	}
 
 	@Activate
@@ -131,13 +139,30 @@ public class CamelJobManager implements FlowJobManager {
 		cContext = new OsgiDefaultCamelContext(ce.getBundleContext());
 
 		try {
-			cContext.addComponent("engine", ec);
+			for (Component c : camelComponents) {
+				registerComponent(c);
+			}
 			cContext.start();
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
 	}
 
+	private void registerComponent(Component c) {
+		if (cContext == null)
+			return;
+		if (c instanceof EngineComponent) {
+			cContext.addComponent("engine", c);
+		} else if (c instanceof ChainComponent) {
+			cContext.addComponent("chain", c);
+		}
+
+	}
+
+	public void unregisterComponent(Component c) {
+		cContext.removeComponent(c instanceof EngineComponent ? "engine" : "chain");
+	}
+	
 	@Deactivate
 	public void deactivate(ComponentContext ce) throws Exception {
 		cContext.stop();

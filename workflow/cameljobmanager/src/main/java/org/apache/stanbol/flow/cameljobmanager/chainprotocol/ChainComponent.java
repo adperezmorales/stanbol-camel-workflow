@@ -23,8 +23,13 @@ import org.apache.camel.impl.DefaultComponent;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.apache.stanbol.enhancer.chainmanager.impl.ChainManagerImpl;
 import org.apache.stanbol.enhancer.servicesapi.Chain;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
+import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
+import org.apache.stanbol.enhancer.servicesapi.impl.ChainsTracker;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 @Component(immediate=true)
 @Service
@@ -32,6 +37,8 @@ public class ChainComponent extends DefaultComponent {
 	
 	@Reference
 	ChainManager manager;
+	@Reference
+	private EnhancementJobManager jobManager;
 	
 	public ChainManager getManager() {
 		return manager;
@@ -47,7 +54,7 @@ public class ChainComponent extends DefaultComponent {
     	Chain chain = manager.getChain(remaining);
     	
     	if (chain != null){
-    		endpoint = new ChainEndpoint(remaining, this, chain);
+    		endpoint = new ChainEndpoint(remaining, this, chain, jobManager);
     	}
     	else{ 
     		throw new IllegalArgumentException("No registered chain referenced by this name : " + remaining);

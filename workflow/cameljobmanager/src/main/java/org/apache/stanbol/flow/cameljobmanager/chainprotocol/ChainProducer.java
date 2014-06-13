@@ -9,9 +9,6 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
 
 public class ChainProducer extends DefaultProducer {
 	
-	@Reference
-	private EnhancementJobManager jobManager;
-
 	public ChainProducer(ChainEndpoint endpoint) {
 		super(endpoint);
 	}
@@ -23,7 +20,7 @@ public class ChainProducer extends DefaultProducer {
     	
     	Chain chain = ((ChainEndpoint)getEndpoint()).chain;
     	
-    	jobManager.enhanceContent(ci, chain);
+    	((ChainEndpoint)getEndpoint()).jobManager.enhanceContent(ci, chain);
     	exchange.getIn().setBody(ci);
 	}
 

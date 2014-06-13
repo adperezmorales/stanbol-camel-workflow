@@ -141,8 +141,13 @@
 						<Export-Package>org.apache.stanbol.flow.cameljobmanager,
 							org.apache.stanbol.flow.cameljobmanager.converter,
 							org.apache.stanbol.flow.cameljobmanager.impl,
-							org.apache.stanbol.flow.cameljobmanager.engineprotocol</Export-Package>
+							org.apache.stanbol.flow.cameljobmanager.engineprotocol,
+							org.apache.stanbol.flow.cameljobmanager.chainprotocol</Export-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
+						<Import-Package>
+              				org.apache.stanbol.enhancer.servicesapi; provide:=true; version="[0.10,1.1)",
+							*
+						</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -153,5 +158,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<version>1.0.0-SNAPSHOT</version>
 </project>
