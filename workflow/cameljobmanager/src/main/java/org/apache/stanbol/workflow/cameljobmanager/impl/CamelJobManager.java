@@ -151,11 +151,15 @@ public class CamelJobManager implements FlowJobManager {
 	private void registerComponent(Component c) {
 		if (cContext == null)
 			return;
-		if (c instanceof EngineComponent) {
-			cContext.addComponent("engine", c);
-		} else if (c instanceof ChainComponent) {
-			cContext.addComponent("chain", c);
+		if(c instanceof EngineComponent) {
+			EngineComponent ec = (EngineComponent) c;
+			cContext.addComponent(ec.getName(), ec);
 		}
+		else if(c instanceof ChainComponent) {
+			ChainComponent cc = (ChainComponent) c;
+			cContext.addComponent(cc.getName(), cc);
+		}
+		
 
 	}
 

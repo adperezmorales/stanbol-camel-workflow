@@ -16,20 +16,21 @@
  */
 package org.apache.stanbol.workflow.cameljobmanager.chainprotocol;
 
+import java.util.Dictionary;
 import java.util.Map;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
+import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.enhancer.chainmanager.impl.ChainManagerImpl;
 import org.apache.stanbol.enhancer.servicesapi.Chain;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
-import org.apache.stanbol.enhancer.servicesapi.impl.ChainsTracker;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.component.ComponentContext;
 
 @Component(immediate=true)
 @Service
@@ -41,6 +42,19 @@ public class ChainComponent extends DefaultComponent {
 	@Reference
 	private EnhancementJobManager jobManager;
 	
+	@Property(value="chain")
+	private static final String NAME = "workflow.component.name";
+	
+	private String name;
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public ChainManager getManager() {
 		return manager;
 	}
@@ -49,6 +63,17 @@ public class ChainComponent extends DefaultComponent {
 		this.manager = manager;
 	}
 
+	@Activate
+	public void activate(ComponentContext ce) {
+		Dictionary props = ce.getProperties();
+		name = (String) props.get(NAME);
+	}
+	
+	@Deactivate
+	public void deactivate(ComponentContext ce) {
+		
+	}
+	
 	protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
 
     	Endpoint endpoint = null;

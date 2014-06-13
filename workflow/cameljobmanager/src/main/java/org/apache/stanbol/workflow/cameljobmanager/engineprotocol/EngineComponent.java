@@ -16,15 +16,21 @@
  */
 package org.apache.stanbol.workflow.cameljobmanager.engineprotocol;
 
+import java.util.Dictionary;
 import java.util.Map;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
+import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
+import org.osgi.service.component.ComponentContext;
 
 @Component(immediate=true)
 @Service
@@ -34,6 +40,30 @@ public class EngineComponent extends DefaultComponent {
 	EnhancementEngineManager manager;
 	   
     
+	@Property(value="chain")
+	private static final String NAME = "workflow.component.name";
+	
+	private String name;
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Activate
+	public void activate(ComponentContext ce) {
+		Dictionary props = ce.getProperties();
+		name = (String) props.get(NAME);
+	}
+	
+	@Deactivate
+	public void deactivate(ComponentContext ce) {
+		
+	}
+	
 	public EnhancementEngineManager getEnhancementEngineManager() {
 		return manager;
 	}
