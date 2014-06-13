@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.stanbol.flow.artifact.route;
+package org.apache.stanbol.workflow.artifact.route;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +27,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
-import org.apache.stanbol.flow.cameljobmanager.impl.CamelJobManager;
+import org.apache.stanbol.workflow.cameljobmanager.impl.CamelJobManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
