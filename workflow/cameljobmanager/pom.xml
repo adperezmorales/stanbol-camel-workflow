@@ -29,7 +29,7 @@
     	Contains all base classes for defining Stanbol-Camel protocols, transformer,...
   	</description>
 
-	<inceptionYear>2011</inceptionYear>
+	<inceptionYear>2014</inceptionYear>
 
 	<properties>
 		<camel-version>2.8.1</camel-version>
@@ -139,11 +139,15 @@
 				<configuration>
 					<instructions>
        				    <Install-Path>config</Install-Path>
-						<Export-Package>org.apache.stanbol.flow.cameljobmanager,
-							org.apache.stanbol.flow.cameljobmanager.converter,
-							org.apache.stanbol.flow.cameljobmanager.impl,
-							org.apache.stanbol.flow.cameljobmanager.engineprotocol,
-							org.apache.stanbol.flow.cameljobmanager.chainprotocol</Export-Package>
+						<Export-Package>org.apache.stanbol.workflow.cameljobmanager,
+							org.apache.stanbol.workflow.cameljobmanager.converter,
+							org.apache.stanbol.workflow.cameljobmanager.impl,
+							org.apache.stanbol.workflow.cameljobmanager.engineprotocol,
+							org.apache.stanbol.workflow.cameljobmanager.chainprotocol,
+							org.apache.stanbol.workflow.context,
+							org.apache.stanbol.workflow.context.activator,
+						</Export-Package>
+						<Bundle-Activator>org.apache.stanbol.workflow.context.activator.StanbolCamelContextActivator</Bundle-Activator>
 						<DynamicImport-Package>*</DynamicImport-Package>
 						<Import-Package>
               				org.apache.stanbol.enhancer.servicesapi; provide:=true; version="[0.10,1.1)",

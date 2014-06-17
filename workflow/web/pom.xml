@@ -51,7 +51,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              org.apache.stanbol.flow.jersey.*
+              org.apache.stanbol.workflow.jersey.*
             </Export-Package>
             <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=jersey-json|jettison|jackson-core-asl|httpmime
             </Embed-Dependency>
