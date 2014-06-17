@@ -5,12 +5,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.felix.scr.annotations.Activate;
@@ -29,6 +27,7 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.workflow.cameljobmanager.chainprotocol.ChainComponent;
 import org.apache.stanbol.workflow.cameljobmanager.engineprotocol.EngineComponent;
+import org.apache.stanbol.workflow.context.StanbolCamelContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +46,11 @@ public class CamelJobManager implements FlowJobManager {
 
 	List<Component> camelComponents = new ArrayList();
 
+	@Reference(policy = ReferencePolicy.STATIC)
+	private StanbolCamelContext stanbolCamelContext;
+
 	private static final Logger logger = LoggerFactory
 			.getLogger(CamelJobManager.class);
-	private CamelContext cContext = null;
 
 	@Reference
 	protected ChainManager chainManager;
@@ -65,14 +66,13 @@ public class CamelJobManager implements FlowJobManager {
 
 	public Boolean addRoutes(InputStream is, String group) {
 		try {
-			RoutesDefinition rds = cContext
+			RoutesDefinition rds = stanbolCamelContext
 
 			.loadRoutesDefinition(is);
-
-			cContext.addRouteDefinitions(rds.getRoutes());
+			stanbolCamelContext.addRouteDefinitions(rds.getRoutes());
 			for (RouteDefinition rd : rds.getRoutes()) {
 				rd.setGroup(group);
-				cContext.startRoute(rd.getId());
+				stanbolCamelContext.startRoute(rd.getId());
 			}
 
 			return true;
@@ -93,11 +93,12 @@ public class CamelJobManager implements FlowJobManager {
 	 */
 	public Boolean removeRoutes(String group) {
 		Boolean removed = false;
-		List<RouteDefinition> routeDefinitions = cContext.getRouteDefinitions();
+		List<RouteDefinition> routeDefinitions = stanbolCamelContext
+				.getRouteDefinitions();
 		for (final RouteDefinition rd : routeDefinitions) {
 			if (rd.getGroup() != null && rd.getGroup().equals(group)) {
 				try {
-					cContext.removeRouteDefinition(rd);
+					stanbolCamelContext.removeRouteDefinition(rd);
 					removed = true;
 				} catch (Exception e) {
 					// Doing nothing. Silent the exception
@@ -119,8 +120,8 @@ public class CamelJobManager implements FlowJobManager {
 	protected void unbindRoute(RoutesBuilder e) throws Exception {
 		RouteBuilder srb = (RouteBuilder) e;
 		for (RouteDefinition routeDefs : srb.getRouteCollection().getRoutes()) {
-			cContext.stopRoute(routeDefs);
-			cContext.removeRouteDefinition(routeDefs);
+			stanbolCamelContext.stopRoute(routeDefs);
+			stanbolCamelContext.removeRouteDefinition(routeDefs);
 		}
 	}
 
@@ -136,40 +137,41 @@ public class CamelJobManager implements FlowJobManager {
 
 	@Activate
 	public void activate(ComponentContext ce) throws IOException {
-		cContext = new OsgiDefaultCamelContext(ce.getBundleContext());
-
 		try {
 			for (Component c : camelComponents) {
 				registerComponent(c);
 			}
-			cContext.start();
+			stanbolCamelContext.start();
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
 	}
 
 	private void registerComponent(Component c) {
-		if (cContext == null)
+		if (stanbolCamelContext == null)
 			return;
-		if(c instanceof EngineComponent) {
+		if (c instanceof EngineComponent) {
 			EngineComponent ec = (EngineComponent) c;
-			cContext.addComponent(ec.getName(), ec);
-		}
-		else if(c instanceof ChainComponent) {
+			if(stanbolCamelContext.getComponent(ec.getName()) == null)
+				stanbolCamelContext.addComponent(ec.getName(), ec);
+		} else if (c instanceof ChainComponent) {
 			ChainComponent cc = (ChainComponent) c;
-			cContext.addComponent(cc.getName(), cc);
+			if(stanbolCamelContext.getComponent(cc.getName()) == null)
+				stanbolCamelContext.addComponent(cc.getName(), cc);
 		}
-		
 
 	}
 
 	private void unregisterComponent(Component c) {
-		cContext.removeComponent(c instanceof EngineComponent ? "engine" : "chain");
+		if (stanbolCamelContext != null)
+			stanbolCamelContext
+					.removeComponent(c instanceof EngineComponent ? "engine"
+							: "chain");
 	}
-	
+
 	@Deactivate
 	public void deactivate(ComponentContext ce) throws Exception {
-		cContext.stop();
+		stanbolCamelContext.stop();
 	}
 
 	@Override
@@ -190,7 +192,7 @@ public class CamelJobManager implements FlowJobManager {
 			throws EnhancementException {
 		// TODO : better integration with REST :
 		// http://camel.apache.org/cxfrs.html
-		ProducerTemplate tpl = cContext.createProducerTemplate();
+		ProducerTemplate tpl = stanbolCamelContext.createProducerTemplate();
 		ContentItem result = tpl.requestBody("direct://" + chain.getName(), ci,
 				ContentItem.class);
 	}
@@ -200,9 +202,9 @@ public class CamelJobManager implements FlowJobManager {
 	}
 
 	private void addRouteToContext(RouteBuilder rb) throws Exception {
-		cContext.addRoutes(rb);
+		stanbolCamelContext.addRoutes(rb);
 		for (RouteDefinition rd : rb.getRouteCollection().getRoutes()) {
-			cContext.startRoute(rd.getId());
+			stanbolCamelContext.startRoute(rd.getId());
 		}
 	}
 
