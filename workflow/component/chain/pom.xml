@@ -18,21 +18,27 @@
 		<groupId>org.apache.stanbol</groupId>
 		<artifactId>apache-stanbol-workflow</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../</relativePath>
+		<relativePath>../../</relativePath>
 	</parent>
 
-	<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
+	<artifactId>org.apache.stanbol.workflow.component.chain</artifactId>
 	<packaging>bundle</packaging>
 
-	<name>Apache Stanbol Workflow : Apache Camel integration </name>
+	<name>Apache Stanbol Workflow : Stanbol Chain Camel Component </name>
 	<description>
-    	Contains all base classes for defining Stanbol-Camel protocols, transformer,...
+    	Contains the Apache Camel Chain component which can be used in routes in order to execute Stanbol chains
   	</description>
 
 	<inceptionYear>2014</inceptionYear>
 
 	<dependencies>
 		<!-- API definition -->
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
@@ -48,11 +54,6 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
-		<!-- for test with @activate methods -->
-		<!-- TODO : remove version number on osgi stuff. But that version are because 
-			of the FrameworkUtil.getBundle in FromContentItemConverter -->
-		<!-- this technik to get bundle is used as @reference on the Clerezza serializer 
-			allways return null... -->
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
@@ -62,10 +63,6 @@
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 		</dependency>
-
-		<!-- TODO : supprimer cette dependencie lorsque test des converter ok -->
-		<!-- <dependency> <groupId>javax.mail</groupId> <artifactId>mail</artifactId> 
-			<version>1.4.4</version> </dependency> -->
 
 		<!-- dependencies for serialization -->
 		<dependency>
@@ -107,18 +104,6 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<!-- Stanbol Camel components dependencies -->
-		<dependency>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.component.chain</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.component.engine</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -132,27 +117,15 @@
 				<configuration>
 					<instructions>
        				    <Install-Path>config</Install-Path>
-						<Export-Package>org.apache.stanbol.workflow.cameljobmanager,
-							org.apache.stanbol.workflow.cameljobmanager.converter,
-							org.apache.stanbol.workflow.cameljobmanager.impl,
-							org.apache.stanbol.workflow.cameljobmanager.engineprotocol,
-							org.apache.stanbol.workflow.cameljobmanager.chainprotocol,
-							org.apache.stanbol.workflow.context,
-							org.apache.stanbol.workflow.context.activator,
+						<Export-Package>org.apache.stanbol.workflow.component.chain
 						</Export-Package>
-						<Bundle-Activator>org.apache.stanbol.workflow.context.activator.StanbolCamelContextActivator</Bundle-Activator>
 						<DynamicImport-Package>*</DynamicImport-Package>
-						<Import-Package>
-              				org.apache.stanbol.enhancer.servicesapi; provide:=true; version="[0.10,1.1)",
-							*
-						</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-scr-plugin</artifactId>
-
 			</plugin>
 		</plugins>
 	</build>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
 	license agreements. See the NOTICE file distributed with this work for additional 
 	information regarding copyright ownership. The ASF licenses this file to 
@@ -9,25 +10,26 @@
 	OF ANY KIND, either express or implied. See the License for the specific 
 	language governing permissions and limitations under the License. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.apache.stanbol</groupId>
-		<artifactId>stanbol-parent</artifactId>
-		<version>5-SNAPSHOT</version>
+		<artifactId>apache-stanbol-workflow</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>stanbol-camel-workflow-reactor</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<artifactId>org.apache.stanbol.workflow.component</artifactId>
 	<packaging>pom</packaging>
-	<name>Apache Stanbol Camel Workflow Reactor</name>
-	<description>Pseudo project to build Apache Stanbol Workflow Component using Apache Camel</description>
 
-	<!-- Modules -->
+	<name>Apache Stanbol Workflow : Stanbol Camel Components</name>
+	<description>Metamodule containing the Camel core components for Stanbol</description>
+
 	<modules>
-		<module>workflow</module>
-		<module>launchers/fullflow</module> <!-- Custom launcher -->
+		<module>core</module>
+		<module>chain</module>
+		<module>engine</module>
 	</modules>
-
 </project>

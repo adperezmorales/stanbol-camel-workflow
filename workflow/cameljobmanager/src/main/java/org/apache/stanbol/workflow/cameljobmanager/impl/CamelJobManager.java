@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.camel.Component;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
@@ -25,8 +24,7 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
-import org.apache.stanbol.workflow.cameljobmanager.chainprotocol.ChainComponent;
-import org.apache.stanbol.workflow.cameljobmanager.engineprotocol.EngineComponent;
+import org.apache.stanbol.workflow.component.core.StanbolCamelComponent;
 import org.apache.stanbol.workflow.context.StanbolCamelContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -40,11 +38,11 @@ import org.slf4j.LoggerFactory;
 @org.apache.felix.scr.annotations.Component(immediate = true, metatype = false)
 @Service(FlowJobManager.class)
 @References({
-		@Reference(referenceInterface = Component.class, name = "CamelComponent", policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE),
+		@Reference(referenceInterface = StanbolCamelComponent.class, name = "StanbolCamelComponent", policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE),
 		@Reference(referenceInterface = RoutesBuilder.class, name = "Route", cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE, policy = ReferencePolicy.DYNAMIC) })
 public class CamelJobManager implements FlowJobManager {
 
-	List<Component> camelComponents = new ArrayList();
+	List<StanbolCamelComponent> camelComponents = new ArrayList();
 
 	@Reference(policy = ReferencePolicy.STATIC)
 	private StanbolCamelContext stanbolCamelContext;
@@ -119,18 +117,19 @@ public class CamelJobManager implements FlowJobManager {
 	 */
 	protected void unbindRoute(RoutesBuilder e) throws Exception {
 		RouteBuilder srb = (RouteBuilder) e;
+		
 		for (RouteDefinition routeDefs : srb.getRouteCollection().getRoutes()) {
 			stanbolCamelContext.stopRoute(routeDefs);
 			stanbolCamelContext.removeRouteDefinition(routeDefs);
 		}
 	}
 
-	protected void bindCamelComponent(Component e) {
+	protected void bindStanbolCamelComponent(StanbolCamelComponent e) {
 		camelComponents.add(e);
 		registerComponent(e);
 	}
 
-	protected void unbindCamelComponent(Component e) {
+	protected void unbindStanbolCamelComponent(StanbolCamelComponent e) {
 		camelComponents.remove(e);
 		unregisterComponent(e);
 	}
@@ -138,8 +137,8 @@ public class CamelJobManager implements FlowJobManager {
 	@Activate
 	public void activate(ComponentContext ce) throws IOException {
 		try {
-			for (Component c : camelComponents) {
-				registerComponent(c);
+			for (StanbolCamelComponent sc : camelComponents) {
+				registerComponent(sc);
 			}
 			stanbolCamelContext.start();
 		} catch (Exception e) {
@@ -147,26 +146,22 @@ public class CamelJobManager implements FlowJobManager {
 		}
 	}
 
-	private void registerComponent(Component c) {
+	private void registerComponent(StanbolCamelComponent component) {
 		if (stanbolCamelContext == null)
 			return;
-		if (c instanceof EngineComponent) {
-			EngineComponent ec = (EngineComponent) c;
-			if(stanbolCamelContext.getComponent(ec.getName()) == null)
-				stanbolCamelContext.addComponent(ec.getName(), ec);
-		} else if (c instanceof ChainComponent) {
-			ChainComponent cc = (ChainComponent) c;
-			if(stanbolCamelContext.getComponent(cc.getName()) == null)
-				stanbolCamelContext.addComponent(cc.getName(), cc);
-		}
+		
+		if(stanbolCamelContext.getComponent(component.getURIScheme()) == null)
+		stanbolCamelContext.addComponent(component.getURIScheme(), component);
+		
 
 	}
 
-	private void unregisterComponent(Component c) {
-		if (stanbolCamelContext != null)
-			stanbolCamelContext
-					.removeComponent(c instanceof EngineComponent ? "engine"
-							: "chain");
+	private void unregisterComponent(StanbolCamelComponent component) {
+		if (stanbolCamelContext == null)
+			return;
+		if(stanbolCamelContext.getComponent(component.getURIScheme()) != null)
+			stanbolCamelContext.removeComponent(component.getURIScheme());
+			
 	}
 
 	@Deactivate
