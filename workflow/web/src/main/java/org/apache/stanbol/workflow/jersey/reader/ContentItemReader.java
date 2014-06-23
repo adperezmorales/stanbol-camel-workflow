@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.stanbol.flow.jersey.reader;
+package org.apache.stanbol.workflow.jersey.reader;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper.randomUUID;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_LANGUAGE;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.PARSED_CONTENT_URIS;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.REQUEST_PROPERTIES_URI;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.PARSED_CONTENT_URIS;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.REQUEST_PROPERTIES_URI;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

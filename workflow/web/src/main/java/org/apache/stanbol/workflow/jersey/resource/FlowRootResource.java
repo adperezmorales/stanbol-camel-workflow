@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.stanbol.flow.jersey.resource;
+package org.apache.stanbol.workflow.jersey.resource;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.N3;
@@ -24,8 +24,8 @@ import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.RDF_XM
 import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.TURTLE;
 import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.X_TURTLE;
 import static org.apache.stanbol.commons.web.base.utils.MediaTypeUtil.JSON_LD;
-import static org.apache.stanbol.flow.jersey.utils.EnhancerUtils.addActiveChains;
-import static org.apache.stanbol.flow.jersey.utils.EnhancerUtils.addActiveEngines;
+import static org.apache.stanbol.workflow.jersey.utils.EnhancerUtils.addActiveChains;
+import static org.apache.stanbol.workflow.jersey.utils.EnhancerUtils.addActiveEngines;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -44,17 +44,21 @@ import org.apache.clerezza.rdf.core.impl.TripleImpl;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.sparql.QueryEngine;
 import org.apache.clerezza.rdf.ontologies.RDF;
+import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.commons.web.base.resource.BaseStanbolResource;
 import org.apache.stanbol.commons.web.base.resource.LayoutConfiguration;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
-import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.enhancer.servicesapi.rdf.Enhancer;
+import org.apache.stanbol.workflow.servicesapi.FlowJobManager;
+import org.osgi.service.component.ComponentContext;
 
 /**
  * RESTful interface to browse the list of available engines and allow to call
@@ -69,7 +73,7 @@ import org.apache.stanbol.enhancer.servicesapi.rdf.Enhancer;
 @Path("/flow")
 public final class FlowRootResource extends BaseStanbolResource {
 
-    @Reference
+	@Reference
     private FlowJobManager jobManager;
     @Reference
     private EnhancementEngineManager engineManager;

@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.stanbol.flow.jersey.resource;
+package org.apache.stanbol.workflow.jersey.resource;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.WILDCARD;
@@ -25,12 +25,12 @@ import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.RDF_XM
 import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.TURTLE;
 import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.X_TURTLE;
 import static org.apache.stanbol.commons.web.base.utils.MediaTypeUtil.JSON_LD;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.INCLUDE_EXECUTION_METADATA;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.OMIT_METADATA;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.OMIT_PARSED_CONTENT;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.OUTPUT_CONTENT;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.OUTPUT_CONTENT_PART;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.RDF_FORMAT;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.INCLUDE_EXECUTION_METADATA;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.OMIT_METADATA;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.OMIT_PARSED_CONTENT;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.OUTPUT_CONTENT;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.OUTPUT_CONTENT_PART;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.RDF_FORMAT;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -65,11 +65,11 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
-import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.enhancer.servicesapi.NoSuchPartException;
 import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
 import org.apache.stanbol.enhancer.servicesapi.rdf.ExecutionMetadata;
-import org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper;
+import org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper;
+import org.apache.stanbol.workflow.servicesapi.FlowJobManager;
 
 /**
  * Abstract super class for all enhancement endpoints that do not use/support

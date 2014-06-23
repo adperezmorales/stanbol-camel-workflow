@@ -1,6 +1,6 @@
 package org.apache.stanbol.workflow.context.activator;
 
-import org.apache.stanbol.workflow.context.StanbolCamelContext;
+import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -24,9 +24,8 @@ public class StanbolCamelContextActivator implements BundleActivator {
      */
     public void start(BundleContext context) throws Exception {  
         this.bundleContext = context;  
-        StanbolCamelContext stanbolContext = new StanbolCamelContext(context);
-        registration = bundleContext.registerService(StanbolCamelContext.class.getName(), stanbolContext, null);
-  
+        OsgiDefaultCamelContext stanbolContext = new OsgiDefaultCamelContext(context);
+        registration = bundleContext.registerService(OsgiDefaultCamelContext.class.getName(), stanbolContext, null);
     }  
 
     /**

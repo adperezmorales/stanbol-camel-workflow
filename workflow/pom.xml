@@ -43,7 +43,7 @@
 		<module>cameljobmanager</module>
 		<module>bundlelist</module>
 	</modules>
-<!-- Properties -->
+	<!-- Properties -->
 	<properties>
 		<camel.version>2.8.1</camel.version>
 		<osgi.version>4.2.0</osgi.version>
@@ -51,6 +51,7 @@
 		<felix.scr.annotations.version>1.9.8</felix.scr.annotations.version>
 		<workflow.version>1.0.0-SNAPSHOT</workflow.version>
 		<stanbol.version>1.0.0-SNAPSHOT</stanbol.version>
+		<guava.version>14.0.1</guava.version>
 	</properties>
 
 	<dependencyManagement>
@@ -110,6 +111,13 @@
 				<groupId>org.apache.stanbol</groupId>
 				<artifactId>org.apache.stanbol.enhancer.core</artifactId>
 				<version>${stanbol.version}</version>
+			</dependency>
+
+			<!-- Guava -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
 			</dependency>
 		</dependencies>
 

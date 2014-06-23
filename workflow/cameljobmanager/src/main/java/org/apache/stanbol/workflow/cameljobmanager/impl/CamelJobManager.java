@@ -5,9 +5,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.felix.scr.annotations.Activate;
@@ -23,9 +23,10 @@ import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
-import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.workflow.component.core.StanbolCamelComponent;
-import org.apache.stanbol.workflow.context.StanbolCamelContext;
+import org.apache.stanbol.workflow.servicesapi.FlowJobManager;
+import org.apache.stanbol.workflow.servicesapi.RouteManager;
+import org.apache.stanbol.workflow.servicesapi.StanbolRoute;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ public class CamelJobManager implements FlowJobManager {
 	List<StanbolCamelComponent> camelComponents = new ArrayList();
 
 	@Reference(policy = ReferencePolicy.STATIC)
-	private StanbolCamelContext stanbolCamelContext;
+	private OsgiDefaultCamelContext stanbolCamelContext;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(CamelJobManager.class);
@@ -53,6 +54,9 @@ public class CamelJobManager implements FlowJobManager {
 	@Reference
 	protected ChainManager chainManager;
 
+	@Reference
+	protected RouteManager routeManager;
+	
 	protected void bindRoute(RoutesBuilder e) throws Exception {
 		RouteBuilder srb = (RouteBuilder) e;
 		addRouteToContext(srb);
@@ -187,9 +191,21 @@ public class CamelJobManager implements FlowJobManager {
 			throws EnhancementException {
 		// TODO : better integration with REST :
 		// http://camel.apache.org/cxfrs.html
-		ProducerTemplate tpl = stanbolCamelContext.createProducerTemplate();
+		/*ProducerTemplate tpl = stanbolCamelContext.createProducerTemplate();
 		ContentItem result = tpl.requestBody("direct://" + chain.getName(), ci,
-				ContentItem.class);
+				ContentItem.class);*/
+		
+		StanbolRoute route = routeManager.getRoute(chain.getName());
+		if(route == null)
+			throw new ChainException(
+					"Unable to enhance ContentItem '"
+							+ ci.getUri()
+							+ "' because currently no route with name "
+							+ chain.getName()
+							+ " is registered. Please"
+							+ "configure a route with that name or execute the default route");
+		
+		route.executeRoute(ci);
 	}
 
 	public List<EnhancementEngine> getActiveEngines() {

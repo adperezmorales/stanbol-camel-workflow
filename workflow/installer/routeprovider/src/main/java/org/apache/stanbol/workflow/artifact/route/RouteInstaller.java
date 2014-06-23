@@ -22,15 +22,10 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
-import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
-import org.apache.stanbol.workflow.cameljobmanager.impl.CamelJobManager;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
+import org.apache.stanbol.workflow.context.activator.StanbolRoutesRegistrator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,30 +40,15 @@ import org.slf4j.LoggerFactory;
 @Service(ArtifactInstaller.class)
 public class RouteInstaller implements ArtifactInstaller
 {
-    private BundleContext context;
-    
     @Reference
-    protected FlowJobManager jobManager;
+    protected StanbolRoutesRegistrator routeRegistrator;
     
     private static final Logger log = LoggerFactory.getLogger(RouteInstaller.class);
-//    private final FileInstall fileInstall;
-    @SuppressWarnings("rawtypes")
-	private ServiceRegistration registration;
 
     public RouteInstaller(){
     	
     }
    
-    public void destroy()
-    {
-        registration.unregister();
-    }
-
-    @Activate
-    public void activate(ComponentContext cc) {
-    	this.context = cc.getBundleContext();
-    }
-    
     public boolean canHandle(File artifact)
     {
         return !artifact.getName().startsWith(".") && artifact.getName().endsWith(".route");
@@ -100,9 +80,9 @@ public class RouteInstaller implements ArtifactInstaller
     boolean setConfig(final File f) throws Exception
     {
     	//Add the route to the context
+    	log.info("Registering Routes Contained in File " + f.getAbsolutePath());
     	FileInputStream fis = new FileInputStream(f);
-    	CamelJobManager manager = (CamelJobManager) jobManager;
-    	return manager.addRoutes(fis, f.getName());
+    	return routeRegistrator.addRoutes(fis, f.getName());
     }
 
     /**
@@ -115,9 +95,8 @@ public class RouteInstaller implements ArtifactInstaller
      */
     boolean deleteConfig(File f) throws Exception
     {
-        //Delete route from Context
-    	CamelJobManager manager = (CamelJobManager) jobManager;
-    	return manager.removeRoutes(f.getName());
+    	log.info("Unregistering Routes Contained in File " + f.getAbsolutePath());
+    	return routeRegistrator.removeRoutes(f.getName());
         
     }
 

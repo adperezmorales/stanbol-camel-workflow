@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.stanbol.flow.jersey.resource;
+package org.apache.stanbol.workflow.jersey.resource;
 
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper.getReference;

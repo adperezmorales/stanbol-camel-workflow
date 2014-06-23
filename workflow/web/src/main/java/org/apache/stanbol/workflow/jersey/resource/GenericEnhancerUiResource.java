@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.stanbol.flow.jersey.resource;
+package org.apache.stanbol.workflow.jersey.resource;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
@@ -51,9 +51,9 @@ import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
-import org.apache.stanbol.enhancer.servicesapi.FlowJobManager;
 import org.apache.stanbol.enhancer.servicesapi.helper.ExecutionPlanHelper;
 import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
+import org.apache.stanbol.workflow.servicesapi.FlowJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

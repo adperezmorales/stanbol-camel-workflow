@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.stanbol.flow.jersey.utils;
+package org.apache.stanbol.workflow.jersey.utils;
 
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Enhancer.ENHANCEMENT_ENGINE;
 

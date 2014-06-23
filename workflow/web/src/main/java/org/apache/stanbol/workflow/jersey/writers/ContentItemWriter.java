@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.stanbol.flow.jersey.writers;
+package org.apache.stanbol.workflow.jersey.writers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
@@ -22,13 +22,13 @@ import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static javax.ws.rs.core.MediaType.WILDCARD_TYPE;
 import static org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper.getBlob;
 import static org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper.getContentParts;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.REQUEST_PROPERTIES_URI;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.getOutputContent;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.getOutputContentParts;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.getParsedContentURIs;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.getRdfFormat;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.isOmitMetadata;
-import static org.apache.stanbol.flow.jersey.utils.RequestPropertiesHelper.isOmitParsedContent;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.REQUEST_PROPERTIES_URI;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.getOutputContent;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.getOutputContentParts;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.getParsedContentURIs;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.getRdfFormat;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.isOmitMetadata;
+import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.isOmitParsedContent;
 
 import java.io.IOException;
 import java.io.InputStream;

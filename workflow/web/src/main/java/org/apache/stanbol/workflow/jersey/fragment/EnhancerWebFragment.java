@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.stanbol.flow.jersey.fragment;
+package org.apache.stanbol.workflow.jersey.fragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +28,7 @@ import org.apache.stanbol.commons.web.base.LinkResource;
 import org.apache.stanbol.commons.web.base.NavigationLink;
 import org.apache.stanbol.commons.web.base.ScriptResource;
 import org.apache.stanbol.commons.web.base.WebFragment;
-import org.apache.stanbol.flow.jersey.resource.FlowRootResource;
+import org.apache.stanbol.workflow.jersey.resource.FlowRootResource;
 
 /**
  * Statically define the list of available resources and providers to be contributed to the the Stanbol JAX-RS
