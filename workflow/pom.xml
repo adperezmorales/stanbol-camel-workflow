@@ -36,7 +36,7 @@
 	<!-- Modules -->
 	<modules>
 		<module>installer/routeprovider</module>
-		<module>archetype</module>
+		<module>archetype/routebuilder</module>
 		<module>servicesapi</module>
 		<module>web</module>
 		<module>component</module>

@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.stanbol</groupId>
-  <artifactId>org.apache.stanbol.workflow.routebuilder-archetype</artifactId>
+  <artifactId>org.apache.stanbol.workflow.archetype.routebuilder</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
-  <name>org.apache.stanbol.workflow.routebuilder-archetype</name>
+  <name>org.apache.stanbol.workflow.archetype.routebuilder</name>
 
   <build>
     <extensions>
