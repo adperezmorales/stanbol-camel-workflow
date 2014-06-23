@@ -39,6 +39,7 @@
 			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 		
+		
 	</startLevel>
 
 	<!-- Web Fragment -->
@@ -70,12 +71,6 @@
   
   <!-- Stanbol Camel Components and Converters -->
   <startLevel level="34">
-  		<bundle>
-  			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
-			<version>1.0.0-SNAPSHOT</version> 
-		</bundle>
-  		
   		<bundle>
   			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.workflow.component.core</artifactId>
