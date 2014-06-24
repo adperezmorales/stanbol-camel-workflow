@@ -27,7 +27,7 @@
 	<!-- Modules -->
 	<modules>
 		<module>workflow</module>
-		<module>launchers/fullflow</module> <!-- Custom launcher -->
+		<module>launchers/workflow</module> <!-- Custom launcher -->
 	</modules>
 
 </project>
