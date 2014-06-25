@@ -42,6 +42,15 @@
 		
 	</startLevel>
 
+	<!-- StartLevel for the cameljobmanager -->
+	<startLevel level="30">
+		<bundle>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</bundle>
+	</startLevel>
+	
 	<!-- Web Fragment -->
 	<startLevel level="31">
 		<bundle>
@@ -90,18 +99,4 @@
 		</bundle>
   </startLevel>
   
-  <!-- Stanbol Enhancer plug-ins (the Enhancement Engines) -->
-  <startLevel level="35">
-	
-  </startLevel>	
-
-	<!-- StartLevel for the cameljobmanager : after engines (level 36)	 -->
-	<startLevel level="36">
-		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</bundle>
-	</startLevel>
-
 </bundles>  
