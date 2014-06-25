@@ -1,0 +1,6 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+	<route id="defaultchain">
+  		<from uri="direct://defaultchain" />
+  		<to uri="chain://default" />
+ 	</route>
+ </routes>

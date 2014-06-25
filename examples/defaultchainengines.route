@@ -1,0 +1,14 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+	<route id="defaultchainengines">
+  		<from uri="direct://defaultchainengines" />
+  		<to uri="engine://tika" />
+  		<to uri="engine://langdetect" />
+  		<to uri="engine://opennlp-sentence" />
+  		<to uri="engine://opennlp-token" />
+  		<to uri="engine://opennlp-pos" />
+  		<to uri="engine://opennlp-ner" />
+  		<to uri="engine://dbpediaLinking" />
+  		<to uri="engine://entityhubExtraction" />
+  		<to uri="engine://dbpedia-dereference" />
+ 	</route>
+ </routes>
