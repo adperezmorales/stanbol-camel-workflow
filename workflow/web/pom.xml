@@ -21,16 +21,16 @@
 
 	<parent>
 		<groupId>org.apache.stanbol</groupId>
-		<artifactId>org.apache.stanbol.flow.reactor</artifactId>
+		<artifactId>apache-stanbol-workflow</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 
-  <artifactId>org.apache.stanbol.flow.web</artifactId>
+  <artifactId>org.apache.stanbol.workflow.web</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Apache Stanbol Flow : Jersey JAX-RS API and front-end</name>
-  <description>Web interface to the Flow module</description>
+  <name>Apache Stanbol Workflow : Jersey JAX-RS API and front-end</name>
+  <description>Web interface for the Workflow module</description>
 
   <build>
     <!-- make it an OSGi bundle -->
@@ -46,12 +46,11 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.3.7</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
             <Export-Package>
-              org.apache.stanbol.flow.jersey.*
+              org.apache.stanbol.workflow.jersey.*
             </Export-Package>
             <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=jersey-json|jettison|jackson-core-asl|httpmime
             </Embed-Dependency>
@@ -59,6 +58,7 @@
             <Import-Package>
               *
             </Import-Package>
+            <DynamicImport-Package>*</DynamicImport-Package>
           </instructions>
         </configuration>
       </plugin>
@@ -81,14 +81,12 @@
   <dependencies>
   	<dependency>
       <groupId>org.apache.stanbol</groupId>
-      <artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
     </dependency>
     <!-- dependencies on other Stanbol modules -->
     <dependency>
       <groupId>org.apache.stanbol</groupId>
       <artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
     </dependency>
     
     <dependency>
@@ -185,7 +183,6 @@
     <dependency>
       <groupId>org.apache.stanbol</groupId>
       <artifactId>org.apache.stanbol.enhancer.core</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>

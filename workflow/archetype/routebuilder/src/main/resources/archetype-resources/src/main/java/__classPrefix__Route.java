@@ -6,7 +6,7 @@ package ${package};
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.felix.scr.annotations.Component
+import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.engines.langdetect.LanguageDetectionEnhancementEngine;
 import org.apache.stanbol.enhancer.engines.tika.TikaEngine;
@@ -26,8 +26,8 @@ public class ${classPrefix}Route extends RouteBuilder {
 	
  	@Override
 	public void configure() throws Exception {
-
-       		RouteDefinition rd = from("direct://"+this.getRouteName()); 
+   		RouteDefinition rd = from("direct://"+this.getRouteName()); 
+		rd.setId("${routeName}Route");
 		createRoute(rd);        
 	}
 
@@ -47,7 +47,7 @@ public class ${classPrefix}Route extends RouteBuilder {
 		/* Create the route. For example, adding the 
 		 * Enhancement Engines producers TikaEngine and LanguageDetectionEnhancementEngine
 		 */
-		rd = rd.to("engine://"+TikaEngine.class.getName());
-	        rd = rd.to("engine://"+LanguageDetectionEnhancementEngine.class.getName());
+		rd = rd.to("engine://tika");
+	        rd = rd.to("engine://langdetect");
 	}
 }

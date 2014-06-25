@@ -35,17 +35,27 @@
 
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
+			<artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 		
+		
 	</startLevel>
 
+	<!-- StartLevel for the cameljobmanager -->
+	<startLevel level="30">
+		<bundle>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</bundle>
+	</startLevel>
+	
 	<!-- Web Fragment -->
 	<startLevel level="31">
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.web</artifactId>
+			<artifactId>org.apache.stanbol.workflow.web</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 	</startLevel>
@@ -63,38 +73,30 @@
   <startLevel level="33">
   		<bundle>
   			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.artifact.route</artifactId>
+			<artifactId>org.apache.stanbol.workflow.artifact.route</artifactId>
 			<version>1.0.0-SNAPSHOT</version> 
 		</bundle>
   </startLevel>
   
-  <!-- Stanbol Enhancer plug-ins (the Enhancement Engines) -->
-  <startLevel level="35">
-	
-  </startLevel>	
-
-	<!-- StartLevel for the cameljobmanager : after engines (level 36)	 -->
-	<startLevel level="36">
-		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.cameljobmanager</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+  <!-- Stanbol Camel Components and Converters -->
+  <startLevel level="34">
+  		<bundle>
+  			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.core</artifactId>
+			<version>1.0.0-SNAPSHOT</version> 
 		</bundle>
-	</startLevel>
-
-	<!-- Chain start : after cameljobmanager -->
-	<startLevel level="40"> 
-		<!-- filepool chain to activate after -->
+		
 		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.filepoolgraphflow</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+  			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.chain</artifactId>
+			<version>1.0.0-SNAPSHOT</version> 
 		</bundle>
+		
 		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.weightedgraphflow</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+  			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.engine</artifactId>
+			<version>1.0.0-SNAPSHOT</version> 
 		</bundle>
-	</startLevel>
-
+  </startLevel>
+  
 </bundles>  

@@ -16,37 +16,31 @@
 
 	<parent>
 		<groupId>org.apache.stanbol</groupId>
-		<artifactId>org.apache.stanbol.flow.reactor</artifactId>
+		<artifactId>apache-stanbol-workflow</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>org.apache.stanbol.flow.cameljobmanager</artifactId>
+	<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
 	<packaging>bundle</packaging>
 
-	<name>Apache Stanbol Flow : Camel integration </name>
+	<name>Apache Stanbol Workflow : Apache Camel integration </name>
 	<description>
     	Contains all base classes for defining Stanbol-Camel protocols, transformer,...
-	TODO : rename is module with a more accurate name.
   	</description>
 
-	<inceptionYear>2011</inceptionYear>
-
-	<properties>
-		<camel-version>2.8.1</camel-version>
-	</properties>
+	<inceptionYear>2014</inceptionYear>
 
 	<dependencies>
 		<!-- API definition -->
 		<dependency>
 			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.flow.servicesapi</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.enhancer.core</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -62,13 +56,11 @@
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.2.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
-			<version>4.2.0</version>
 		</dependency>
 
 		<!-- TODO : supprimer cette dependencie lorsque test des converter ok -->
@@ -84,29 +76,11 @@
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.commons.web.base</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-servlet</artifactId>
-			<version>2.2</version>
-		</dependency>
-
-		<!-- Camel dependencies -->
-		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-core-osgi</artifactId>
-			<version>${camel-version}</version>
-		</dependency>
-
+		
 		<!-- Stanbol dependencies -->
 		<dependency>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -114,18 +88,41 @@
 			<artifactId>org.apache.felix.scr.annotations</artifactId>
 		</dependency>
 
+		<!-- Guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
 		<!-- for testing -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Camel dependencies -->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-core-osgi</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-test</artifactId>
-			<version>${camel-version}</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<!-- Stanbol Camel components dependencies -->
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.chain</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.engine</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -139,10 +136,15 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>org.apache.stanbol.flow.cameljobmanager,
-							org.apache.stanbol.flow.cameljobmanager.converter,
-							org.apache.stanbol.flow.cameljobmanager.impl,
-							org.apache.stanbol.flow.cameljobmanager.engineprotocol</Export-Package>
+       				    <Install-Path>config</Install-Path>
+						<Export-Package>
+							org.apache.stanbol.workflow.cameljobmanager,
+							org.apache.stanbol.workflow.cameljobmanager.converter,
+							org.apache.stanbol.workflow.cameljobmanager.impl,
+							org.apache.stanbol.workflow.context,
+							org.apache.stanbol.workflow.context.activator,
+						</Export-Package>
+						<Bundle-Activator>org.apache.stanbol.workflow.context.activator.StanbolCamelContextActivator</Bundle-Activator>
 						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>
@@ -154,5 +156,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<version>1.0.0-SNAPSHOT</version>
 </project>

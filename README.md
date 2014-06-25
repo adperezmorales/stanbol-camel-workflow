@@ -15,35 +15,31 @@
   limitations under the License.
 -->
 
-# Building Flow endpoint
+# Building Workflow endpoint
 
-    $ cd flow/ ; mvn clean install;
-    $ cd felix-fileinstall-route-artifact/ ; mvn clean install; # Used to deploy routes placing a file with 'route' extension in some directory
-    $ cd launchers/fullflow ; mvn clean install;
+    $ cd workflow/ ; mvn clean install;
+    $ cd launchers/workflow ; mvn clean install;
 
 # Starting Stanbol
 
-    $ cd flow/fullflow/target ; java -jar org.apache.stanbol.launchers.fullflow-1.0.0-SNAPSHOT.jar;
+    $ cd launchers/workflow/target ; java -jar org.apache.stanbol.launchers.workflow-1.0.0-SNAPSHOT.jar;
 
-If you want to deploy Camel routes defined in XML, you have to specify the system property *felix.fileinstall.dir* pointing to the directory to be monitored. For other supported Fileinstall component properties, visit [this link](http://http://felix.apache.org/site/apache-felix-file-install.html "Apache Felix fileinstall")
+If you want to deploy Camel routes defined in XML, you have to put a Camel XML route with *route* extension in *stanbol/fileinstall* directory. If you want to change the directory where to put the Camel XML routes, you have to specify the system property *felix.fileinstall.dir* pointing to the directory to be monitored. For other supported Apache Felix Fileinstall component properties, visit [this link](http://http://felix.apache.org/site/apache-felix-file-install.html "Apache Felix fileinstall")
 
-    $ cd flow/fullflow/target : java -Dfelix.fileinstall.dir=./stanbol/fileinstall/ -jar org.apache.stanbol.launchers.fullflow-1.0.0-SNAPSHOT.jar; # In order to use the same directory used by Stanbol to deploy bundles
+    $ cd launchers/workflow/target : java -Dfelix.fileinstall.dir=./stanbol/fileinstall/ -jar org.apache.stanbol.launchers.workflow-1.0.0-SNAPSHOT.jar; # In order to use the same directory used by Stanbol to deploy bundles
 
-# Testing Flow :
-
-## Pool flow feature
-
-By default a file endpoint will fetch all files in /tmp/chaininput folder, process it with the langId engine and then write the xml-rdf result in /tmp/chainoutput folder.
+# Testing Workflow component:
 
 ## On demand flow feature
 
-The flow endpoint offer sub-ressource that allow you to directly call some predefined particular flow.
+The flow endpoint offer sub-resource that allow you to directly call some predefined particular route
 
 Template for this request is :
 
     $ curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" --data "content=Here comes a little test with Paris as content and also Berlin but why not detect city as Boston and some well know people like Bob Marley." http://localhost:8080/flow
 
-Flow/Route definition for default can be find here : https://github.com/adperezmorales/stanbol-camel-workflow/blob/master/flow/weightedgraphflow/src/main/java/org/apache/stanbol/flow/weightedgraphflow/WeightedChain.java
+http://localhost:8080/flow/{directRouteName} endpoint is used to start a route by its id defined using a XML file or Java Object (in a bundle). 
 
-http://localhost:8080/flow/{directRouteName} endpoint is used to start a direct route defined using a XML file or Java Object (in a bundle)
+To try the default enhancement chain (using chain Camel component), please copy the *examples/defaultchain.route* to *stanbol/fileinstall* directory and use the ***http://localhost:8080/flow/defaultchain*** endpoint to enhance content
 
+If you want to try the same default enhancement chain but using a route based on engine components, please copy the *examples/defaultchainengines.route* to *stanbol/fileinstall* directory and use the ***http://localhost:8080/flow/defaultchainengines*** endpoint to enhance content
