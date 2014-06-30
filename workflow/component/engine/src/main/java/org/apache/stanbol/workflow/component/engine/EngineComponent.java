@@ -27,6 +27,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
 import org.apache.stanbol.workflow.component.core.StanbolCamelComponent;
+import org.apache.stanbol.workflow.component.core.impl.BaseStanbolCamelComponent;
 import org.osgi.service.component.ComponentContext;
 
 /**
@@ -38,14 +39,20 @@ import org.osgi.service.component.ComponentContext;
  */
 @Component(immediate=true)
 @Service(StanbolCamelComponent.class)
-public class EngineComponent extends StanbolCamelComponent {
+public class EngineComponent extends BaseStanbolCamelComponent {
 	
+	/**
+	 * <p>Default URI Scheme used if no one is configured</p>
+	 */
+	public static final String DEFAULT_URI_SCHEME = "engine";
+			
 	@Reference
 	EnhancementEngineManager manager;
 	   
 	@Activate
 	public void activate(ComponentContext ce) {
 		super.activate(ce);
+		this.uriScheme = this.uriScheme == null ? DEFAULT_URI_SCHEME : this.uriScheme;
 	}
 	
 	@Deactivate

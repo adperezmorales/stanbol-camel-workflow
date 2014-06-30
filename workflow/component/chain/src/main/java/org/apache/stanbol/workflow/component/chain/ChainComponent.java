@@ -28,6 +28,7 @@ import org.apache.stanbol.enhancer.servicesapi.Chain;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
 import org.apache.stanbol.workflow.component.core.StanbolCamelComponent;
+import org.apache.stanbol.workflow.component.core.impl.BaseStanbolCamelComponent;
 import org.osgi.service.component.ComponentContext;
 
 /**
@@ -39,7 +40,12 @@ import org.osgi.service.component.ComponentContext;
  */
 @Component(immediate=true)
 @Service(StanbolCamelComponent.class)
-public class ChainComponent extends StanbolCamelComponent {
+public class ChainComponent extends BaseStanbolCamelComponent {
+	
+	/**
+	 * <p>Default URI Scheme used if no one is configured</p>
+	 */
+	public static final String DEFAULT_URI_SCHEME = "chain";
 	
 	@Reference
 	ChainManager manager;
@@ -59,6 +65,8 @@ public class ChainComponent extends StanbolCamelComponent {
 	@Activate
 	public void activate(ComponentContext ce) {
 		super.activate(ce);
+		super.activate(ce);
+		this.uriScheme = this.uriScheme == null ? DEFAULT_URI_SCHEME : this.uriScheme;
 	}
 	
 	@Deactivate
@@ -81,4 +89,5 @@ public class ChainComponent extends StanbolCamelComponent {
         setProperties(endpoint, parameters);
         return endpoint;
     }
+
 }

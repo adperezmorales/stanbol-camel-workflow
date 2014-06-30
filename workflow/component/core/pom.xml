@@ -70,7 +70,8 @@
 				<configuration>
 					<instructions>
        				    <Install-Path>config</Install-Path>
-						<Export-Package>org.apache.stanbol.workflow.component.core
+						<Export-Package>org.apache.stanbol.workflow.component.core,
+							org.apache.stanbol.workflow.component.core.impl
 						</Export-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
