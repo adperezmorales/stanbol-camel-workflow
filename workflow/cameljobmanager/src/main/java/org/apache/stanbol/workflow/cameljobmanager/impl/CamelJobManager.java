@@ -16,7 +16,7 @@ import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
-import org.apache.stanbol.workflow.component.core.StanbolCamelComponent;
+import org.apache.stanbol.workflow.component.core.impl.BaseStanbolCamelComponent;
 import org.apache.stanbol.workflow.servicesapi.FlowJobManager;
 import org.apache.stanbol.workflow.servicesapi.RouteManager;
 import org.apache.stanbol.workflow.servicesapi.StanbolRoute;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @Service(FlowJobManager.class)
 public class CamelJobManager implements FlowJobManager {
 
-	List<StanbolCamelComponent> camelComponents = new ArrayList();
+	List<BaseStanbolCamelComponent> camelComponents = new ArrayList();
 
 	@Reference(policy = ReferencePolicy.STATIC)
 	private OsgiDefaultCamelContext stanbolCamelContext;
@@ -47,12 +47,12 @@ public class CamelJobManager implements FlowJobManager {
 	@Reference
 	protected ChainManager chainManager;
 	
-	protected void bindStanbolCamelComponent(StanbolCamelComponent e) {
+	protected void bindStanbolCamelComponent(BaseStanbolCamelComponent e) {
 		camelComponents.add(e);
 		registerComponent(e);
 	}
 
-	protected void unbindStanbolCamelComponent(StanbolCamelComponent e) {
+	protected void unbindStanbolCamelComponent(BaseStanbolCamelComponent e) {
 		camelComponents.remove(e);
 		unregisterComponent(e);
 	}
@@ -60,7 +60,7 @@ public class CamelJobManager implements FlowJobManager {
 	@Activate
 	public void activate(ComponentContext ce) throws IOException {
 		try {
-			for (StanbolCamelComponent sc : camelComponents) {
+			for (BaseStanbolCamelComponent sc : camelComponents) {
 				registerComponent(sc);
 			}
 			stanbolCamelContext.start();
@@ -69,7 +69,7 @@ public class CamelJobManager implements FlowJobManager {
 		}
 	}
 
-	private void registerComponent(StanbolCamelComponent component) {
+	private void registerComponent(BaseStanbolCamelComponent component) {
 		if (stanbolCamelContext == null)
 			return;
 		
@@ -79,7 +79,7 @@ public class CamelJobManager implements FlowJobManager {
 
 	}
 
-	private void unregisterComponent(StanbolCamelComponent component) {
+	private void unregisterComponent(BaseStanbolCamelComponent component) {
 		if (stanbolCamelContext == null)
 			return;
 		if(stanbolCamelContext.getComponent(component.getURIScheme()) != null)

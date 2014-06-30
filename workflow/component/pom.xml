@@ -31,5 +31,6 @@
 		<module>core</module>
 		<module>chain</module>
 		<module>engine</module>
+		<module>activemq</module>
 	</modules>
 </project>

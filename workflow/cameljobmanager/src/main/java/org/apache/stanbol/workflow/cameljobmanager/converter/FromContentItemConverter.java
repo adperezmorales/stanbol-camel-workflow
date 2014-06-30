@@ -76,5 +76,12 @@ public final class FromContentItemConverter {
 		 
 		return factory.createContentItem(new StringSource("Error during transformation", mimetype));
 	}
+
+    @Converter
+    public ContentItem stringToContentItem(String content, Exchange exchange) throws IOException {
+    	InMemoryContentItemFactory factory = InMemoryContentItemFactory.getInstance();
+    	ContentItem ci = factory.createContentItem(new StringSource(content));
+    	return ci;
+    }
         
 }
