@@ -65,7 +65,6 @@ public class ChainComponent extends BaseStanbolCamelComponent {
 	@Activate
 	public void activate(ComponentContext ce) {
 		super.activate(ce);
-		super.activate(ce);
 		this.uriScheme = this.uriScheme == null ? DEFAULT_URI_SCHEME : this.uriScheme;
 	}
 	
