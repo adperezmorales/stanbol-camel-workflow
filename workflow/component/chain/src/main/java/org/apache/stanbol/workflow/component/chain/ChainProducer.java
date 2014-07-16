@@ -5,6 +5,7 @@ import org.apache.camel.impl.DefaultProducer;
 import org.apache.stanbol.enhancer.servicesapi.Chain;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
+import org.apache.stanbol.workflow.servicesapi.helper.ContentItemWorkflowHelper;
 
 /**
  * <p>ChainProducer class</p>
@@ -24,6 +25,7 @@ public class ChainProducer extends DefaultProducer {
 
 		ContentItem ci = exchange.getIn().getBody(ContentItem.class);
     	
+		ContentItemWorkflowHelper.setEnhancementRequestProperties(ci, ((ChainEndpoint)getEndpoint()).parameters);
     	Chain chain = ((ChainEndpoint)getEndpoint()).chain;
     	EnhancementJobManager jobManager = ((ChainEndpoint)getEndpoint()).jobManager;
     	jobManager.enhanceContent(ci, chain);

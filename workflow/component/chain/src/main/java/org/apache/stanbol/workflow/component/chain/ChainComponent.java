@@ -79,13 +79,15 @@ public class ChainComponent extends BaseStanbolCamelComponent {
     	Chain chain = manager.getChain(remaining);
     	
     	if (chain != null){
-    		endpoint = new ChainEndpoint(remaining, this, chain, jobManager);
+    		endpoint = new ChainEndpoint(remaining, this, chain, jobManager, parameters);
     	}
     	else{ 
     		throw new IllegalArgumentException("No registered chain referenced by this name : " + remaining);
     	}
     	
-        setProperties(endpoint, parameters);
+    	setProperties(endpoint, parameters);
+    	//Clear properties to avoid Camel error, because these properties will be used in the configured engines and not in the endpoint itself
+        parameters.clear();
         return endpoint;
     }
 

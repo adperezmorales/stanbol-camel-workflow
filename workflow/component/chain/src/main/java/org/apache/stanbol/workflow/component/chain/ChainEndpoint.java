@@ -1,5 +1,8 @@
 package org.apache.stanbol.workflow.component.chain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
@@ -19,11 +22,12 @@ public class ChainEndpoint extends DefaultEndpoint {
 	final Chain chain;
 	
 	final EnhancementJobManager jobManager;
-	
-	public ChainEndpoint(String uri, ChainComponent component, Chain chain, EnhancementJobManager jobManager) {
+	final Map<String,Object> parameters;
+	public ChainEndpoint(String uri, ChainComponent component, Chain chain, EnhancementJobManager jobManager, Map<String, Object> parameters) {
         super(uri, component);
         this.chain = chain;
         this.jobManager = jobManager;
+        this.parameters = new HashMap<String,Object>(parameters);
     }
 
 	@Override
