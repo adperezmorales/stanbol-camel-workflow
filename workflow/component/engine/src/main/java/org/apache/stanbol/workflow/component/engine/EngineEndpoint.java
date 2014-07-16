@@ -16,6 +16,9 @@
  */
 package org.apache.stanbol.workflow.component.engine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
@@ -32,10 +35,11 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 public class EngineEndpoint extends DefaultEndpoint {
 	
 	final EnhancementEngine engine;
-    	
-	public EngineEndpoint(String uri, EngineComponent component, EnhancementEngine e) {
+	final Map<String,Object> parameters;
+	public EngineEndpoint(String uri, EngineComponent component, EnhancementEngine e, Map<String,Object> parameters) {
         super(uri, component);
         this.engine = e;
+        this.parameters = new HashMap<String,Object>(parameters);
     }
 
 	@Override

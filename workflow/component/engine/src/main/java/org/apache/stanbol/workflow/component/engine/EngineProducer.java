@@ -16,10 +16,13 @@
  */
 package org.apache.stanbol.workflow.component.engine;
 
+import java.util.Map;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
+import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
 
 /**
  * <p>EngineProducer class</p>
@@ -40,10 +43,20 @@ public class EngineProducer extends DefaultProducer {
     	EnhancementEngine stanbolEngine = ((EngineEndpoint)getEndpoint()).engine;
     	
     	if (stanbolEngine.canEnhance(ci) != EnhancementEngine.CANNOT_ENHANCE){
+    		setEngineProperties(ci);
     		stanbolEngine.computeEnhancements(ci);
     		exchange.getIn().setBody(ci);
     	}
     	
     }
 
+    /**
+     * <p>Sets the configured engine properties into the {@link ContentItem} being processed</p>
+     * 
+     * @param ci the {@code ContentItem} object being processed
+     */
+    private void setEngineProperties(ContentItem ci) {
+    	Map<String,Object> reqProp = ContentItemHelper.initRequestPropertiesContentPart(ci);
+        reqProp.putAll(((EngineEndpoint)this.getEndpoint()).parameters);
+    }
 }

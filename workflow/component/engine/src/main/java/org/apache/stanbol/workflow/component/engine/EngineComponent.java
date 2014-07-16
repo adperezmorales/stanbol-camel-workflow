@@ -48,7 +48,7 @@ public class EngineComponent extends BaseStanbolCamelComponent {
 			
 	@Reference
 	EnhancementEngineManager manager;
-	   
+	
 	@Activate
 	public void activate(ComponentContext ce) {
 		super.activate(ce);
@@ -74,13 +74,14 @@ public class EngineComponent extends BaseStanbolCamelComponent {
     	EnhancementEngine e = manager.getEngine(remaining);
     	
     	if (e != null){
-    		endpoint = new EngineEndpoint(remaining, this, e);
+    		endpoint = new EngineEndpoint(remaining, this, e, parameters);
     	}
     	else{ 
     		throw new IllegalArgumentException("No registered engine referenced by this name : " + remaining);
     	}
     	
         setProperties(endpoint, parameters);
+        parameters.clear();
         return endpoint;
     }
 }
