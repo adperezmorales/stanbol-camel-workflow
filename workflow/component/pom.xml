@@ -32,5 +32,6 @@
 		<module>chain</module>
 		<module>engine</module>
 		<module>activemq</module>
+		<module>stanbol-solr</module>
 	</modules>
 </project>
