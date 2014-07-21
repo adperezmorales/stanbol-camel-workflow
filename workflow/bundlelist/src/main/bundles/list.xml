@@ -33,13 +33,14 @@
 			<version>1.0</version>
 		</bundle>
 
+	</startLevel>
+	
+	<startLevel level="21">
 		<bundle>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.workflow.servicesapi</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
-
-
 	</startLevel>
 
 	<!-- Camel ActiveMQ and JMS dependencies: Spring, Javax, Apache Commons Pool -->
@@ -130,6 +131,38 @@
 		</bundle>
 	</startLevel>
 	
+	<!-- Stanbol Camel Components and Converters (Before fileinstall, to have all the componenets prepared for already deployed routes) -->
+	<startLevel level="27">
+		<bundle>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</bundle>
+
+		<bundle>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.chain</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</bundle>
+
+		<bundle>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.engine</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</bundle>
+
+		<bundle>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.activemq</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</bundle>
+		
+		<bundle>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>org.apache.stanbol.workflow.component.stanbol-solr</artifactId>
+		</bundle>
+	</startLevel>
+	
 	<!-- StartLevel for the cameljobmanager -->
 	<startLevel level="30">
 		<bundle>
@@ -167,35 +200,5 @@
 		</bundle>
 	</startLevel>
 
-	<!-- Stanbol Camel Components and Converters -->
-	<startLevel level="34">
-		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.component.core</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</bundle>
-
-		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.component.chain</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</bundle>
-
-		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.component.engine</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</bundle>
-
-		<bundle>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.component.activemq</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</bundle>
-		
-		<bundle>
-			<groupId>org.apache.camel</groupId>
-		</bundle>
-	</startLevel>
 
 </bundles>  
