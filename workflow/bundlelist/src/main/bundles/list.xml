@@ -112,6 +112,16 @@
 		</bundle>
 	</startLevel>
 	
+	<!-- StartLevel for the cameljobmanager (Contains the registration of OsgiDefaultCamelContext) -->
+	<!-- Move the registration to a more appropriate bundle -->
+	<startLevel level="25">
+		<bundle>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</bundle>
+	</startLevel>
+	
 	<!-- Camel ActiveMQ, JMS and Solr components -->
 	<startLevel level="26">
 		<bundle>
@@ -158,20 +168,12 @@
 		</bundle>
 		
 		<bundle>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>org.apache.stanbol.workflow.component.stanbol-solr</artifactId>
-		</bundle>
-	</startLevel>
-	
-	<!-- StartLevel for the cameljobmanager -->
-	<startLevel level="30">
-		<bundle>
 			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.workflow.cameljobmanager</artifactId>
+			<artifactId>org.apache.stanbol.workflow.component.stanbol-solr</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</bundle>
 	</startLevel>
-
+	
 	<!-- Web Fragment -->
 	<startLevel level="31">
 		<bundle>
