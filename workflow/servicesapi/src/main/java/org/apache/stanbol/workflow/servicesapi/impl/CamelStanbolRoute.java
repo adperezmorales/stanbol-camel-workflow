@@ -27,12 +27,12 @@ public class CamelStanbolRoute implements StanbolRoute {
 		
 	@Override
 	public void startRoute() throws Exception {
-		context.startRoute(routeDefinition);
+		context.startRoute(routeDefinition.getId());
 	}
 
 	@Override
 	public void stopRoute() throws Exception {
-		context.stopRoute(routeDefinition);
+		context.stopRoute(routeDefinition.getId());
 	}
 
 	@Override

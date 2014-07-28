@@ -25,7 +25,7 @@
 	<packaging>bundle</packaging>
 
 	<name>Apache Stanbol Workflow : Services API</name>
-	<description>The Stanbol Flow Services API</description>
+	<description>The Stanbol Workflow Services API</description>
 
 	<inceptionYear>2014</inceptionYear>
 
@@ -39,6 +39,7 @@
 					<instructions>
 						<Export-Package>
 							org.apache.stanbol.workflow.servicesapi;version=${project.version},
+							org.apache.stanbol.workflow.servicesapi.exception;version=${project.version},
 							org.apache.stanbol.workflow.servicesapi.helper;version=${project.version},
 							org.apache.stanbol.workflow.servicesapi.impl;version=${project.version}
 						</Export-Package>
@@ -64,6 +65,7 @@
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.workflow.component.core</artifactId>
 		</dependency>
+		
 		<!-- Camel -->
 		<dependency>
 			<groupId>org.apache.camel</groupId>
