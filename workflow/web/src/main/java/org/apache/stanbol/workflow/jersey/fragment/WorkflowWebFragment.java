@@ -28,7 +28,6 @@ import org.apache.stanbol.commons.web.base.LinkResource;
 import org.apache.stanbol.commons.web.base.NavigationLink;
 import org.apache.stanbol.commons.web.base.ScriptResource;
 import org.apache.stanbol.commons.web.base.WebFragment;
-import org.apache.stanbol.workflow.jersey.resource.FlowRootResource;
 
 /**
  * Statically define the list of available resources and providers to be contributed to the the Stanbol JAX-RS
@@ -36,7 +35,7 @@ import org.apache.stanbol.workflow.jersey.resource.FlowRootResource;
  */
 @Component(immediate = true, metatype = true)
 @Service
-public class EnhancerWebFragment implements WebFragment {
+public class WorkflowWebFragment implements WebFragment {
 
     private static final String NAME = "flow";
 
@@ -96,7 +95,7 @@ public class EnhancerWebFragment implements WebFragment {
     @Override
     public List<NavigationLink> getNavigationLinks() {
         List<NavigationLink> links = new ArrayList<NavigationLink>();
-        links.add(new NavigationLink("flow", "/flow", htmlDescription, 10));
+        links.add(new NavigationLink("workflow", "/workflow", htmlDescription, 10));
         return links;
     }
 

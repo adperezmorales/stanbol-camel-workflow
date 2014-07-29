@@ -15,11 +15,14 @@
   limitations under the License.
 -->
 
-<h3>Stateless REST analysis</h3>
+<h3>Stateless REST workflow analysis</h3>
 
-<p>This stateless interface allows the caller to submit content to the Stanbol enhancer engines and
+<p>This stateless interface allows the caller to submit content to the Stanbol workflow and
 get the resulting enhancements formatted as RDF at once without storing anything on the
 server-side.</p>
+<p><strong>Take into account that this is only useful if the route to be executed is a synchronous (triggered by http requests) route and the result is a content item</strong></p>
+<p><strong>There can be asynchronous routes triggered by events occurred in a queue (for example) and ending with a content item sent to another remote component (e.g Solr).</strong></p>
+<p><strong>Another kind of routes can start synchronously (using http requests) and finishing in a remote component. In this case the response containing the content item is still sent to the client, so the client will receive the response</strong></p>
 
 <p>The content to analyze should be sent in a POST request with the mimetype specified in
 the <code>Content-type</code> header. The response will hold the RDF enhancement serialized
@@ -34,7 +37,7 @@ curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" \
 <p>The list of mimetypes accepted as inputs depends on the deployed engines. By default only
  <code>text/plain</code> content will be analyzed</p>
  
-<p>Stanbol enhancer is able to serialize the response in the following RDF formats:</p>
+<p>Stanbol Workflow is able to serialize the response in the following RDF formats:</p>
 <ul>
 <li><code>application/json</code> (JSON-LD)</li>
 <li><code>application/rdf+xml</code> (RDF/XML)</li>
@@ -51,16 +54,11 @@ curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" \
     to provide the URI of the content-item to be used in the enhancements RDF 
     graph.
 <code>uri</code> request parameter
-<li><code>executionmetadata=true/false</code>: 
-    Allows the include of execution metadata in the response. Such data include
-    the ExecutionPlan as provided by the enhancement chain as well as
-    information about the actual execution of that plan. The default value
-    is <code>false</code>.</li>
 </ul>
 
 <h4>Example</h4>
 
-<p>The following example shows how to send an enhancement request with a
+<p>The following example shows how to send an workflow enhancement request with a
 custom content item URI that will include the execution metadata in the
 response.</p>
 
@@ -68,5 +66,5 @@ response.</p>
 curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" \
      --data "The Stanbol enhancer can detect famous cities such as \
              Paris and people such as Bob Marley." \
-     "${it.serviceUrl}?uri=urn:fise-example-content-item&executionmetadata=true"
+     "${it.serviceUrl}?uri=urn:fise-example-content-item"
 </pre> 

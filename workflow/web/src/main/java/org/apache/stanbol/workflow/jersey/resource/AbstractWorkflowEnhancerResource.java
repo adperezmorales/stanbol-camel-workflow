@@ -16,15 +16,7 @@
  */
 package org.apache.stanbol.workflow.jersey.resource;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.WILDCARD;
-import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.N3;
-import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.N_TRIPLE;
-import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.RDF_JSON;
-import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.RDF_XML;
-import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.TURTLE;
-import static org.apache.clerezza.rdf.core.serializedform.SupportedFormat.X_TURTLE;
-import static org.apache.stanbol.commons.web.base.utils.MediaTypeUtil.JSON_LD;
 import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.INCLUDE_EXECUTION_METADATA;
 import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.OMIT_METADATA;
 import static org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper.OMIT_PARSED_CONTENT;
@@ -38,10 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -57,48 +46,39 @@ import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.stanbol.commons.web.base.resource.LayoutConfiguration;
 import org.apache.stanbol.commons.web.base.resource.TemplateLayoutConfiguration;
 import org.apache.stanbol.commons.web.base.utils.MediaTypeUtil;
-import org.apache.stanbol.enhancer.servicesapi.Chain;
-import org.apache.stanbol.enhancer.servicesapi.ChainException;
-import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
-import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.NoSuchPartException;
 import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
 import org.apache.stanbol.enhancer.servicesapi.rdf.ExecutionMetadata;
 import org.apache.stanbol.workflow.jersey.utils.RequestPropertiesHelper;
-import org.apache.stanbol.workflow.servicesapi.FlowJobManager;
+import org.apache.stanbol.workflow.servicesapi.WorkflowJobManager;
 
 /**
- * Abstract super class for all enhancement endpoints that do not use/support
+ * Abstract super class for all workflow endpoints that do not use/support
  * the default Enhancer Web UI.<p>
  * This is mainly used for supporting enhancement requests to single
- * enhancement engines.
+ * route.
  * 
- * @author Rupert Westenthaler
+ * @author Antonio David Perez Morales <adperezmorales@gmail.com>
  *
  */
-public abstract class AbstractEnhancerResource extends TemplateLayoutConfiguration {
+public abstract class AbstractWorkflowEnhancerResource extends TemplateLayoutConfiguration {
 
-    protected final FlowJobManager jobManager;
-    protected final EnhancementEngineManager engineManager;
-    protected final ChainManager chainManager;
+    protected final WorkflowJobManager workflowJobManager;
     protected final ContentItemFactory ciFactory;
+    
     private LayoutConfiguration layoutConfiguration;
     private UriInfo uriInfo;
 
-    public AbstractEnhancerResource(
-            FlowJobManager jobManager, 
-            EnhancementEngineManager engineManager, 
-            ChainManager chainManager, 
+    public AbstractWorkflowEnhancerResource(
+            WorkflowJobManager jobManager, 
             ContentItemFactory ciFactory,
             LayoutConfiguration layoutConfiguration,
             UriInfo uriInfo) {
-        this.jobManager = jobManager;
-        this.engineManager = engineManager;
-        this.chainManager = chainManager;
+        this.workflowJobManager = jobManager;
         this.ciFactory = ciFactory;
         this.layoutConfiguration = layoutConfiguration;
         this.uriInfo = uriInfo;
@@ -113,48 +93,11 @@ public abstract class AbstractEnhancerResource extends TemplateLayoutConfigurati
     }
 
     /**
-     * Getter for the Enhancement {@link Chain}
-     * @return the enhancement chain. MUST NOT return <code>null</code>
-     * @throws ChainException if the Chain is currently not available
+     * Getter for the Enhancement route
+     * @return the route id
      */
-    protected abstract Chain getChain() throws ChainException;
+    protected abstract String getRouteId();
     
-    /*@OPTIONS
-    public Response handleCorsPreflight(@Context HttpHeaders headers) {
-        ResponseBuilder res = Response.ok();
-        enableCORS(servletContext, res, headers);
-        return res.build();
-    }
-
-    @OPTIONS
-    @Path("/ep")
-    public Response handleEpCorsPreflight(@Context HttpHeaders headers) {
-        ResponseBuilder res = Response.ok();
-        enableCORS(servletContext, res, headers,HttpMethod.OPTIONS,HttpMethod.GET);
-        return res.build();
-    }*/
-
-    @GET
-    @Path("/ep")
-    @Produces(value = {JSON_LD, APPLICATION_JSON, N3, N_TRIPLE, RDF_JSON, RDF_XML, TURTLE, X_TURTLE})
-    public Response getExecutionPlan(@Context HttpHeaders headers) {
-        ResponseBuilder res;
-        Chain chain = null;
-        try {
-            chain = getChain();
-            res = Response.ok(chain.getExecutionPlan());
-        } catch (ChainException e) {
-            String chainName = chain == null ? "" : ("'"+chain.getName()+"' ");
-            res = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("The Enhancement Chain "+chainName+"is currently" +
-                    		"not executeable (message: "+e.getMessage()+")!");
-        }
-        //addCORSOrigin(servletContext, res, headers);
-        return res.build();
-        
-        
-    }
-
     /**
      * Media-Type based handling of the raw POST data.
      * 
@@ -226,8 +169,8 @@ public abstract class AbstractEnhancerResource extends TemplateLayoutConfigurati
      * @throws EnhancementException
      */
     protected void enhance(ContentItem ci, Map<String,Object> reqProp) throws EnhancementException {
-        if (jobManager != null) {
-            jobManager.enhanceContent(ci, getChain());
+        if (workflowJobManager != null) {
+            workflowJobManager.enhanceContent(ci, getRouteId());
         }
         MGraph graph = ci.getMetadata();
         Boolean includeExecutionMetadata = RequestPropertiesHelper.isIncludeExecutionMetadata(reqProp);

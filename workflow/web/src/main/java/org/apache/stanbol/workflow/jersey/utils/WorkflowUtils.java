@@ -37,9 +37,9 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementEngineManager;
 import org.apache.stanbol.enhancer.servicesapi.rdf.Enhancer;
 import org.osgi.framework.ServiceReference;
 
-public final class EnhancerUtils {
+public final class WorkflowUtils {
 
-    private EnhancerUtils(){};
+    private WorkflowUtils(){};
     
     
     /**

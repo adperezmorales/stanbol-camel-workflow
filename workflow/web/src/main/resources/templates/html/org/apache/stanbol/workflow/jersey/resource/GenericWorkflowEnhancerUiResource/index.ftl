@@ -16,41 +16,16 @@
 -->
 <#import "/imports/common.ftl" as common>
 <#escape x as x?html>
-<@common.page title="Enhancement Engine ${it.name}" hasrestapi=true>
+<@common.page title="Apache Stanbol Enhancer" hasrestapi=true>
+
 
 <div class="panel" id="webview">
-<p> Enhancement Engine Details: <ul>
-<li> name: ${it.name}
-<li> class: ${it.engine.class}
-<li> ordering: ${it.ordering}
-<li> service.id : ${it.id}
-<li> service.ranking: ${it.ranking}
-</ul>
-
-<#if it.pid??>
-<p class="note">You can <a href="${it.consoleBaseUri}/configMgr/${it.pid}">
-configure this engine</a> by using the the Configuration Tab of the OSGi console.</p>
-</#if>
-
-<#--
-<p> This is the list of all active Enhancement Engines active for 
-the name ${it.name}:
-<ul>
-  <#list it.engines as engine>
-    <li> <a href="${it.publicBaseUri}enhancer/engine/${engine.name}">${engine.name}</a>
-      (impl: ${engine.class.simpleName})
-  </#list>
-</ul>
-<p>
--->
+  <#include "/imports/workflowweb.ftl">
 </div>
 
 <div class="panel" id="restapi" style="display: none;">
-<h3>Enhancement Engines RESTful API</h3>
-
-<p>This stateless interface allows the caller to query all available
-Enhancement Engines</p>
-
+  <#include "/imports/doc/workflowbase.ftl">
+  <#include "/imports/doc/multipartcontentitem.ftl">
 </div>
 
 </@common.page>
