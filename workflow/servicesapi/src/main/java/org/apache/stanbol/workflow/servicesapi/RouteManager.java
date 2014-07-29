@@ -3,6 +3,8 @@
  */
 package org.apache.stanbol.workflow.servicesapi;
 
+import java.util.List;
+
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.osgi.framework.ServiceReference;
 
@@ -31,7 +33,7 @@ public interface RouteManager {
      * Getter for the Route for the parsed name
      * @param name The name - MUST NOT be <code>null</code> empty and tracked
      * by this tracker
-     * @return The {@link EnhancementEngine} or <code>null</code> if no Engine
+     * @return The {@link StanbolRoute} or <code>null</code> if no route
      * with the given name is active
      * @throws IllegalArgumentException if the parsed name is <code>null</code>,
      * empty or not tracked by this tracker instance.
@@ -39,21 +41,19 @@ public interface RouteManager {
     StanbolRoute getRoute(String name);
     
     /**
-     * Getter for the {@link EnhancementEngine} service for the parsed
-     * service Reference. This method allows to also retrieve the service for
-     * other engines than the one with the highest service ranking by using
-     * <code><pre>
-     *     for(ServiceReference engineRef : tracker.getReferences("test")){
-     *         EnhancementEngine engine = tracker.getEngine(engineRef)
-     *         if(engine != null) { //may become inactive in the meantime
-     *             //save the world by using this engine!
-     *         }
-     *     }
-     * </pre></code>
-     * @param engineReference the service reference for an engine tracked by this
+     * Getter for the Route service for the parsed
+     * service Reference. 
+     * 
+     * @param routeReference the service reference for a route tracked by this
      * component
-     * @return the referenced {@link EnhancementEngine} or <code>null</code>
+     * @return the referenced {@link StanbolRoute} or <code>null</code>
      * if no longer available.
      */
-    StanbolRoute getRoute(ServiceReference engineReference);
+    StanbolRoute getRoute(ServiceReference routeReference);
+    
+    /**
+     * Getter for all the registered Routes
+     * @return a {@code List} containing all the registered routes
+     */
+    List<StanbolRoute> getRoutes();
 }

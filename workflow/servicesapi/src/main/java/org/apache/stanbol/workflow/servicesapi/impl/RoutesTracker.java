@@ -1,5 +1,9 @@
 package org.apache.stanbol.workflow.servicesapi.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.stanbol.enhancer.servicesapi.impl.NameBasedServiceTrackingState;
 import org.apache.stanbol.workflow.servicesapi.RouteManager;
 import org.apache.stanbol.workflow.servicesapi.StanbolRoute;
@@ -80,14 +84,33 @@ public class RoutesTracker implements RouteManager {
 		return nameTracker.getReference(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.apache.stanbol.workflow.servicesapi.RouteManager#getRoute(java.lang.String)
+	 */
 	@Override
 	public StanbolRoute getRoute(String name) {
 		ServiceReference reference = getReference(name);
 		return reference == null ? null : (StanbolRoute) nameTracker.getService(reference);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.apache.stanbol.workflow.servicesapi.RouteManager#getRoute(org.osgi.framework.ServiceReference)
+	 */
 	@Override
 	public StanbolRoute getRoute(ServiceReference engineReference) {
 		return (StanbolRoute) nameTracker.getService(engineReference);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.apache.stanbol.workflow.servicesapi.RouteManager#getRoutes()
+	 */
+	@Override
+	public List<StanbolRoute> getRoutes() {
+		Object[] services = nameTracker.getServices();
+		return services == null || services.length == 0 ? new ArrayList<StanbolRoute>() : Arrays.asList(Arrays.copyOf(services, services.length, StanbolRoute[].class));
+		
 	}
 }

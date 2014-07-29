@@ -45,7 +45,7 @@ public class CamelStanbolRoute implements StanbolRoute {
 	
 	@Override
 	public String getRoutePath() {
-		return routeDefinition.getDescriptionText();
+		return routeDefinition.toString();
 	}
 
 	@Override
