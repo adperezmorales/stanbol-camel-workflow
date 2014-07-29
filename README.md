@@ -30,15 +30,15 @@ If you want to deploy Camel routes defined in XML, you have to put a Camel XML r
 
 # Testing Workflow component:
 
-## On demand flow feature
+## On demand workflow feature
 
-The flow endpoint offer sub-resource that allow you to directly call some predefined particular route
+The workflow endpoint offers sub-resource that allow you to directly call some predefined particular route
 
 Template for this request is :
 
-    $ curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" --data "content=Here comes a little test with Paris as content and also Berlin but why not detect city as Boston and some well know people like Bob Marley." http://localhost:8080/flow
+    $ curl -X POST -H "Accept: text/turtle" -H "Content-type: text/plain" --data "content=Here comes a little test with Paris as content and also Berlin but why not detect city as Boston and some well know people like Bob Marley." http://localhost:8080/workflow
 
-http://localhost:8080/flow/{directRouteName} endpoint is used to start a route by its id defined using a XML file or Java Object (in a bundle). 
+http://localhost:8080/workflow/{workflowRoute} endpoint is used to start a route by its id defined using a XML file or Java Object (in a bundle). 
 
 To try the default enhancement chain (using chain Camel component), please copy the *examples/defaultchain.route* to *stanbol/fileinstall* directory and use the ***http://localhost:8080/flow/defaultchain*** endpoint to enhance content
 
