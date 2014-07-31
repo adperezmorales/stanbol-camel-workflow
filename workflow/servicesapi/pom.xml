@@ -66,6 +66,12 @@
 			<artifactId>org.apache.stanbol.workflow.component.core</artifactId>
 		</dependency>
 		
+		<!-- Guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		
 		<!-- Camel -->
 		<dependency>
 			<groupId>org.apache.camel</groupId>

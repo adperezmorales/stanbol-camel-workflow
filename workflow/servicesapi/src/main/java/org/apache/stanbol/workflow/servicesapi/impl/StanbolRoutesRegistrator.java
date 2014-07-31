@@ -1,4 +1,4 @@
-package org.apache.stanbol.workflow.context.activator;
+package org.apache.stanbol.workflow.servicesapi.impl;
 
 import java.io.InputStream;
 import java.util.Dictionary;
@@ -30,6 +30,14 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 
+/**
+ * <p>StanbolRoutesRegistrator class</p>
+ * <p>The responsability of this class is to add routes (either specified as Java classes or XML route files) in the Camel context and also in the OSGI registry</p>
+ * <p>The {@code RouteManager} component will use the route registered by this component to retrieve and execute routes</p>
+ * 
+ * @author Antonio David Perez Morales <adperezmorales@gmail.com>
+ *
+ */
 @org.apache.felix.scr.annotations.Component(immediate = true, metatype = false)
 @Service(StanbolRoutesRegistrator.class)
 @References({
@@ -66,6 +74,7 @@ public class StanbolRoutesRegistrator {
 	}
 	
 	public Boolean addRoutes(InputStream is, String group) {
+		logger.debug("Adding routes from stream. Group: "+group);
 		try {
 			RoutesDefinition rds = 
 					stanbolCamelContext.loadRoutesDefinition(is);
@@ -77,6 +86,7 @@ public class StanbolRoutesRegistrator {
 			}
 			return true;
 		} catch (Exception e) {
+			logger.debug("Routes could not be added. Reason: "+e.getMessage());
 			return false;
 		}
 	}

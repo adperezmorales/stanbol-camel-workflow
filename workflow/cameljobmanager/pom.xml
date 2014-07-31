@@ -88,11 +88,6 @@
 			<artifactId>org.apache.felix.scr.annotations</artifactId>
 		</dependency>
 
-		<!-- Guava -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
 		<!-- for testing -->
 		<dependency>
 			<groupId>junit</groupId>

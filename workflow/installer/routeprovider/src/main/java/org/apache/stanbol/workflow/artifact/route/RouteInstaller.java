@@ -25,79 +25,87 @@ import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.workflow.context.activator.StanbolRoutesRegistrator;
+import org.apache.stanbol.workflow.servicesapi.impl.StanbolRoutesRegistrator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Apache Felix Fileinstall ArtifactInstaller for routes</p>
- * <p>Manages files with 'route' extension and load the routes in the Stanbol Camel Context</p>
+ * <p>
+ * Apache Felix Fileinstall ArtifactInstaller for routes
+ * </p>
+ * <p>
+ * Manages files with 'route' extension and load the routes in the Stanbol Camel
+ * Context
+ * </p>
  * 
  * @author Antonio David Perez Morales <adperezmorales@gmail.com>
  * 
  */
-@Component(immediate=true)
+@Component(immediate = true)
 @Service(ArtifactInstaller.class)
-public class RouteInstaller implements ArtifactInstaller
-{
-    @Reference
-    protected StanbolRoutesRegistrator routeRegistrator;
-    
-    private static final Logger log = LoggerFactory.getLogger(RouteInstaller.class);
+public class RouteInstaller implements ArtifactInstaller {
+	@Reference
+	protected StanbolRoutesRegistrator routeRegistrator;
 
-    public RouteInstaller(){
-    	
-    }
-   
-    public boolean canHandle(File artifact)
-    {
-        return !artifact.getName().startsWith(".") && artifact.getName().endsWith(".route");
-    }
+	private static final Logger log = LoggerFactory
+			.getLogger(RouteInstaller.class);
 
-    public void install(File artifact) throws Exception
-    {
-        setConfig(artifact);
-    }
+	public RouteInstaller() {
 
-    public void update(File artifact) throws Exception
-    {
-        setConfig(artifact);
-    }
+	}
 
-    public void uninstall(File artifact) throws Exception
-    {
-        deleteConfig(artifact);
-    }
+	public boolean canHandle(File artifact) {
+		return !artifact.getName().startsWith(".")
+				&& artifact.getName().endsWith(".route");
+	}
 
-    /**
-     * Set the configuration based on the config file.
-     *
-     * @param f
-     *            Configuration file
-     * @return <code>true</code> if the configuration has been updated
-     * @throws Exception
-     */
-    boolean setConfig(final File f) throws Exception
-    {
-    	//Add the route to the context
-    	log.info("Registering Routes Contained in File " + f.getAbsolutePath());
-    	FileInputStream fis = new FileInputStream(f);
-    	return routeRegistrator.addRoutes(fis, f.getName());
-    }
+	public void install(File artifact) throws Exception {
+		setConfig(artifact);
+	}
 
-    /**
-     * Remove the configuration.
-     *
-     * @param f
-     *            File where the configuration in was defined.
-     * @return <code>true</code>
-     * @throws Exception
-     */
-    boolean deleteConfig(File f) throws Exception
-    {
-    	log.info("Unregistering Routes Contained in File " + f.getAbsolutePath());
-    	return routeRegistrator.removeRoutes(f.getName());
-        
-    }
+	public void update(File artifact) throws Exception {
+		setConfig(artifact);
+	}
+
+	public void uninstall(File artifact) throws Exception {
+		deleteConfig(artifact);
+	}
+
+	/**
+	 * Set the configuration based on the config file.
+	 * 
+	 * @param f
+	 *            Configuration file
+	 * @return <code>true</code> if the configuration has been updated
+	 * @throws Exception
+	 */
+	boolean setConfig(final File f) throws Exception {
+		// Add the route to the context
+		log.info("Registering Routes Contained in File " + f.getAbsolutePath());
+		FileInputStream fis = new FileInputStream(f);
+		Boolean result = routeRegistrator.addRoutes(fis, f.getName());
+		if (!result) {
+			// If the route could not be added, then remove the file so that in
+			// the next Stanbol startup, this route is not tried to be added
+			// again
+			f.delete();
+		}
+		return result;
+	}
+
+	/**
+	 * Remove the configuration.
+	 * 
+	 * @param f
+	 *            File where the configuration in was defined.
+	 * @return <code>true</code>
+	 * @throws Exception
+	 */
+	boolean deleteConfig(File f) throws Exception {
+		log.info("Unregistering Routes Contained in File "
+				+ f.getAbsolutePath());
+		return routeRegistrator.removeRoutes(f.getName());
+
+	}
 
 }
