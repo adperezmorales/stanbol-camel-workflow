@@ -20,16 +20,19 @@ import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -41,10 +44,13 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
 import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
+import org.apache.stanbol.workflow.jersey.service.WorkflowRouteUploaderService;
 import org.apache.stanbol.workflow.servicesapi.RouteManager;
 import org.apache.stanbol.workflow.servicesapi.StanbolRoute;
 import org.apache.stanbol.workflow.servicesapi.WorkflowJobManager;
 import org.apache.stanbol.workflow.servicesapi.exception.WorkflowException;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +70,10 @@ public class GenericWorkflowEnhancerUiResource extends AbstractWorkflowEnhancerR
     protected final Serializer serializer;
     protected final String routeId;
     private List<StanbolRoute> routes;
+    private WorkflowRouteUploaderService routeUploaderService;
     
     public GenericWorkflowEnhancerUiResource(String routeId,
+    		WorkflowRouteUploaderService routeUploaderService,
             WorkflowJobManager jobManager, 
             RouteManager routeManager,
             ContentItemFactory ciFactory,
@@ -75,6 +83,7 @@ public class GenericWorkflowEnhancerUiResource extends AbstractWorkflowEnhancerR
     	super(jobManager, ciFactory, layoutConfiguration, uriInfo);
         this.serializer = serializer;
         this.routeManager = routeManager;
+        this.routeUploaderService = routeUploaderService;
         
         if(routeId == null){
             this.routeId = WorkflowJobManager.DEFAULT_ROUTE_NAME;
@@ -146,6 +155,29 @@ public class GenericWorkflowEnhancerUiResource extends AbstractWorkflowEnhancerR
         }
     }
 
+    /**
+     * <p>Uploads a route to the routes directory, so that the {@code RouteInstaller} component can install the new route</p>
+     * <p>It should be noted that if the route file can be copied to the routes directory successfully, the method will return an OK response although
+     * later, the {@code RouteInstaller} component can install or not the route in the Camel context</p>
+     * 
+     * @param inputStream the {@code InputStream} object containing the file content
+     * @param cd The {@code FormDataContentDisposition} object containing some information about the uploaded file
+     * @return the {@code Response} object specifying the status code and a message if it is an error response
+     */
+    @PUT
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response installRoute(@FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition cd) {
+    	log.debug("Installing route");
+    	try {
+    		routeUploaderService.uploadRoute(cd.getFileName(), inputStream);
+			return Response.ok().build();
+		} catch (IOException e) {
+			log.debug("Error installing route. Reason: "+e.getMessage());
+			return Response.serverError().entity("Error creating and installing the uploaded route: "+e.getMessage()).build();
+		}
+    	
+    }
+    
     public String getServiceUrl() {
         String uri = getUriInfo().getAbsolutePath().toString();
         return uri.charAt(uri.length()-1) == '/' ?

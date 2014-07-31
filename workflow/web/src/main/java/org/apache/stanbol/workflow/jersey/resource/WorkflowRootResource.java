@@ -16,6 +16,8 @@
  */
 package org.apache.stanbol.workflow.jersey.resource;
 
+import java.io.File;
+
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
@@ -27,8 +29,10 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.commons.web.base.resource.BaseStanbolResource;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
+import org.apache.stanbol.workflow.jersey.service.WorkflowRouteUploaderService;
 import org.apache.stanbol.workflow.servicesapi.RouteManager;
 import org.apache.stanbol.workflow.servicesapi.WorkflowJobManager;
+import org.osgi.framework.BundleContext;
 
 /**
  * <p>
@@ -45,35 +49,45 @@ import org.apache.stanbol.workflow.servicesapi.WorkflowJobManager;
 public final class WorkflowRootResource extends BaseStanbolResource {
 
 	@Reference
-    private WorkflowJobManager jobManager;
-    @Reference
-    private ContentItemFactory ciFactory;
-    @Reference
-    private Serializer serializer;
-    @Reference
-    private QueryEngine queryEngine;
-    
-    @Reference
-    private RouteManager routeManager;
-    
-    
-    @Path("")
-    public GenericWorkflowEnhancerUiResource get() {
-    	return new GenericWorkflowEnhancerUiResource(null, jobManager, routeManager, ciFactory, serializer, getLayoutConfiguration(),
-                getUriInfo());
-    }
-    
-    /**
-     * <p>Call a specific workflow route using the route id</p>
-     * <p>So it is mandatory to deploy a route with such id</p>
-     * 
-     * @param route The route id
-     * @return a {@code GenericWorkflowEnhancerUiResource} instance
-     */
-    @Path("{workflowRoute}")
-    public GenericWorkflowEnhancerUiResource get(@PathParam(value = "workflowRoute") String route) {
-        return new GenericWorkflowEnhancerUiResource(route, jobManager, routeManager, ciFactory, serializer,
-                getLayoutConfiguration(), getUriInfo());
-    }
-    
+	private WorkflowJobManager jobManager;
+	@Reference
+	private ContentItemFactory ciFactory;
+	@Reference
+	private Serializer serializer;
+	@Reference
+	private QueryEngine queryEngine;
+
+	@Reference
+	private RouteManager routeManager;
+
+	@Reference
+	private WorkflowRouteUploaderService routeUploaderService;
+	
+	@Path("")
+	public GenericWorkflowEnhancerUiResource get() {
+		return new GenericWorkflowEnhancerUiResource(null, routeUploaderService, jobManager,
+				routeManager, ciFactory, serializer, getLayoutConfiguration(),
+				getUriInfo());
+	}
+
+	/**
+	 * <p>
+	 * Call a specific workflow route using the route id
+	 * </p>
+	 * <p>
+	 * So it is mandatory to deploy a route with such id
+	 * </p>
+	 * 
+	 * @param route
+	 *            The route id
+	 * @return a {@code GenericWorkflowEnhancerUiResource} instance
+	 */
+	@Path("{workflowRoute}")
+	public GenericWorkflowEnhancerUiResource get(
+			@PathParam(value = "workflowRoute") String route) {
+		return new GenericWorkflowEnhancerUiResource(route, routeUploaderService, jobManager,
+				routeManager, ciFactory, serializer, getLayoutConfiguration(),
+				getUriInfo());
+	}
+
 }

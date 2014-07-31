@@ -28,6 +28,7 @@ import org.apache.stanbol.commons.web.base.LinkResource;
 import org.apache.stanbol.commons.web.base.NavigationLink;
 import org.apache.stanbol.commons.web.base.ScriptResource;
 import org.apache.stanbol.commons.web.base.WebFragment;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 /**
  * Statically define the list of available resources and providers to be contributed to the the Stanbol JAX-RS
@@ -37,7 +38,7 @@ import org.apache.stanbol.commons.web.base.WebFragment;
 @Service
 public class WorkflowWebFragment implements WebFragment {
 
-    private static final String NAME = "flow";
+    private static final String NAME = "workflow";
 
 
 	private static final String htmlDescription = 
@@ -66,6 +67,7 @@ public class WorkflowWebFragment implements WebFragment {
         //Reader/Writer for ContentItems
         //classes.add(ContentItemReader.class);
         //classes.add(ContentItemWriter.class);
+        classes.add(MultiPartFeature.class);
         return classes;
     }
 
