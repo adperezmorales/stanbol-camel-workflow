@@ -17,7 +17,8 @@
 <#import "/imports/common.ftl" as common>
 <#escape x as x?html>
 <@common.page title="Apache Stanbol Enhancer" hasrestapi=true>
-
+<!-- Adding jQuery 1.7 because 1.4.2 has a bug sending files through Ajax -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
 <div class="panel" id="webview">
   <#include "/imports/workflowweb.ftl">

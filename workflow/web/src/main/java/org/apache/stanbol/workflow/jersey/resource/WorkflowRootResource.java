@@ -16,8 +16,6 @@
  */
 package org.apache.stanbol.workflow.jersey.resource;
 
-import java.io.File;
-
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
@@ -32,7 +30,6 @@ import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.workflow.jersey.service.WorkflowRouteUploaderService;
 import org.apache.stanbol.workflow.servicesapi.RouteManager;
 import org.apache.stanbol.workflow.servicesapi.WorkflowJobManager;
-import org.osgi.framework.BundleContext;
 
 /**
  * <p>

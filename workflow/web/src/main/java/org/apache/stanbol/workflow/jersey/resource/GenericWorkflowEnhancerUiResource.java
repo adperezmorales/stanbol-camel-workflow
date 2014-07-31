@@ -166,6 +166,7 @@ public class GenericWorkflowEnhancerUiResource extends AbstractWorkflowEnhancerR
      */
     @PUT
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.TEXT_HTML)
     public Response installRoute(@FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition cd) {
     	log.debug("Installing route");
     	try {

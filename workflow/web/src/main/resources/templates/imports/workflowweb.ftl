@@ -14,10 +14,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-
 <#if !it.routes?has_content>
   <p><em>There seems to be a problem with the Workflow component, because no routes are registered 
-   To fix this an Administrator needs to install some routes by using the <a href="/system/console">OSGi console</a>.</em></p>
+   To fix this an Administrator needs to install some routes by using the <a href="/system/console">OSGi console</a>.</em>
+   or use the following form to upload a new route</p>
+   </p>
 <#else>
   <#assign routes = it.routes>
   <div class="workflow-listing">
@@ -44,6 +45,56 @@
 });*/     
 </script>
 </#if>
+<div id="routeUploaderWrapper">
+	<form id="routeUploaderForm" method="POST" enctype="multipart/form-data">
+		<p>Select a file containing a route:</p>
+		<input type="file" id="routeFile" name="file" />
+		<input type="submit" class="submit" value="Upload route" />
+	</form>
+</div>
+<div id="routeUploaderWaiter" style="display: none">
+	<p>Uploading route...</p>
+	<p><img alt="Waiting..." src="${it.staticRootUrl}/home/images/ajax-loader.gif" /></p>
+</div>
+<p id="routeUploaderOutput"></p>
+  
+<script type="text/javascript">
+function registerRouteUploaderFormHandler() {
+   $("#routeUploaderForm input.submit", this).click(function(e) {
+     
+     // disable regular form click
+     e.preventDefault();
+     
+     var base = window.location.href.replace(/\/$/, "");
+     
+     var formData = new FormData();
+     formData.append("file", $("#routeFile")[0].files.item(0));
+    	
+     $("#routeUploaderWaiter").show();
+     
+     // submit the form query using Ajax
+     $.ajax({
+       type: "PUT",
+       url: base,
+       data: formData,
+       dataType: "html",
+       processData: false, // Don't process the files
+	   contentType: false,
+       cache: false,
+       success: function(result) {
+         $("#routeUploaderWaiter").hide();
+         $("#routeUploaderOutput").html("Route enqueued successfully. The route may take some time to be installed");
+       },
+       error: function(result) {
+         $("#routeUploaderWaiter").hide();
+         $("#routeUploaderOutput").text(result);
+       }
+     });
+   });
+ }
+ $(document).ready(registerRouteUploaderFormHandler);
+</script>
+  
 <#if it.routes?has_content>
   <p>Paste some text below and submit the form to let the Workflow route <strong><em>${it.routeId}</em></strong> enhance it:</p>
   <form id="workflowInput" method="POST" accept-charset="utf-8">
