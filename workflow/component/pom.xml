@@ -33,5 +33,6 @@
 		<module>engine</module>
 		<module>activemq</module>
 		<module>stanbol-solr</module>
+		<module>stanbol-siren</module>
 	</modules>
 </project>

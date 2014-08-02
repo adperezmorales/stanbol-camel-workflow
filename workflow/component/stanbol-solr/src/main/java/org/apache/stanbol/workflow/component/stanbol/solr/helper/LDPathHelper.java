@@ -4,12 +4,16 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.marmotta.ldpath.LDPath;
 import org.apache.marmotta.ldpath.api.backend.RDFBackend;
 import org.apache.marmotta.ldpath.exception.LDPathParseException;
 import org.apache.marmotta.ldpath.model.programs.Program;
+import org.apache.stanbol.enhancer.engines.dereference.DereferenceConstants;
+import org.apache.stanbol.enhancer.servicesapi.ContentItem;
+import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
 import org.apache.stanbol.entityhub.ldpath.backend.AbstractBackend;
 import org.apache.stanbol.entityhub.model.clerezza.RdfValueFactory;
 import org.apache.stanbol.entityhub.servicesapi.EntityhubException;
@@ -76,6 +80,24 @@ public class LDPathHelper {
 		}
 
 		return contextFields;
+	}
+	
+	/**
+	 * <p>
+	 * Extracts the ldpath program configured within a ContentItem
+	 * </p>
+	 * 
+	 * @param ci
+	 *            The {@code ContentItem} object where to get the dereference
+	 *            engine from
+	 * @return
+	 */
+	public static final String extractLdpath(ContentItem ci) {
+		Map<String, Object> enhancerRequestProperties = ContentItemHelper
+				.getRequestPropertiesContentPart(ci);
+		return (String) enhancerRequestProperties
+				.get(DereferenceConstants.DEREFERENCE_ENTITIES_LDPATH);
+
 	}
 
 	/**

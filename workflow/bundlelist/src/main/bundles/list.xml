@@ -11,6 +11,15 @@
 	language governing permissions and limitations under the License. -->
 
 <bundles>
+	<!-- GSON dependency -->
+	<startLevel level="10">
+		<bundle>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</bundle>
+	</startLevel>
+	
 	<!-- Stanbol Chain infrastructure and required libraries -->
 	<startLevel level="20">
 

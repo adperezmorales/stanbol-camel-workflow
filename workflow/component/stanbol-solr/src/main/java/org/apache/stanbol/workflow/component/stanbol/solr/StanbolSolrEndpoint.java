@@ -29,7 +29,7 @@ import org.apache.camel.component.solr.SolrEndpoint;
 
 /**
  * <p>
- * StanbolSolrCamelEndpoint class
+ * StanbolSolrEndpoint class
  * </p>
  * <p>
  * Camel endpoint for stanbol-solr scheme
@@ -47,21 +47,21 @@ public class StanbolSolrEndpoint extends SolrEndpoint {
 	 */
 	private static final String FIELD_SEPARATOR = ",|, ";
 
-	final Map<String, Object> parameters;
+	protected final Map<String, Object> parameters;
 
 	/**
 	 * <p>
 	 * The LDPath program
 	 * </p>
 	 */
-	private String ldpath = null;
+	protected String ldpath = null;
 
 	/**
 	 * <p>
 	 * The list of fields to be dereferenced
 	 * </p>
 	 */
-	private List<String> fields = new ArrayList<String>();
+	protected List<String> fields = new ArrayList<String>();
 
 	/**
 	 * <p>
@@ -69,9 +69,9 @@ public class StanbolSolrEndpoint extends SolrEndpoint {
 	 * should be used if no ldpath program is supplied
 	 * </p>
 	 */
-	private Boolean useDereferenceLdpath = true;
+	protected Boolean useDereferenceLdpath = true;
 
-	final StanbolSolrComponent stanbolSolrComponent;
+	protected final StanbolSolrComponent stanbolSolrComponent;
 
 	public StanbolSolrEndpoint(String uri, StanbolSolrComponent component,
 			String address, Map<String, Object> parameters) throws Exception {
@@ -88,7 +88,7 @@ public class StanbolSolrEndpoint extends SolrEndpoint {
 	@Override
 	public Producer createProducer() throws Exception {
 		super.createProducer(); // Creating custom Solr Servers
-		StanbolSolrProducer producer = new StanbolSolrProducer(this,
+		SolrProducerWrapper producer = new StanbolSolrProducer(this,
 				getComponent().getSolrServer(this), getComponent()
 						.getUpdateSolrServer(this));
 		return producer;

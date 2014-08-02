@@ -17,36 +17,53 @@ import org.apache.stanbol.workflow.component.core.StanbolCamelComponent;
 import org.osgi.service.component.ComponentContext;
 
 /**
- * <p>ActiveMQStanbolCamelComponent class</p>
- * <p>Camel component to deal with activemq in routes</p>
- * <p>This component simply wraps
+ * <p>
+ * StanbolSolrComponent class
+ * </p>
+ * <p>
+ * Camel component to deal with Stanbol Solr in routes
+ * </p>
+ * <p>
+ * This component uses the result of an enhancement chain to extract fields from
+ * entities in order to store them along with the content in Solr
+ * </p>
  * 
  * @author Antonio David Perez Morales <adperezmorales@gmail.com>
- *
+ * 
  */
-@org.apache.felix.scr.annotations.Component(immediate=true)
+@org.apache.felix.scr.annotations.Component(immediate = true)
 @Service(StanbolCamelComponent.class)
-public class StanbolSolrComponent extends SolrComponent implements StanbolCamelComponent {
+public class StanbolSolrComponent extends SolrComponent implements
+		StanbolCamelComponent {
 
 	/**
-	 * <p>Default URI Scheme used if no one is configured</p>
+	 * <p>
+	 * Default URI Scheme used if no one is configured
+	 * </p>
 	 */
-	public static final String DEFAULT_URI_SCHEME = "stanbol-solr";
-	
+	protected static String DEFAULT_URI_SCHEME = "stanbol-solr";
+
 	/**
-	 * <p>Namespace prefix service</p>
+	 * <p>
+	 * Namespace prefix service
+	 * </p>
 	 */
 	@Reference
-	private NamespacePrefixService namespacePrefixService;
-	
+	protected NamespacePrefixService namespacePrefixService;
+
 	/**
-	 * <p>URI Scheme managed by this component</p>
+	 * <p>
+	 * URI Scheme managed by this component
+	 * </p>
 	 */
-	@Property(name=URI_SCHEME_PROPERTY)
+	@Property(name = URI_SCHEME_PROPERTY)
 	protected String uriScheme;
-	
+
 	/**
-	 * <p>Gets the URI Scheme managed by the component</p>
+	 * <p>
+	 * Gets the URI Scheme managed by the component
+	 * </p>
+	 * 
 	 * @return String the URI scheme
 	 */
 	public String getURIScheme() {
@@ -54,28 +71,39 @@ public class StanbolSolrComponent extends SolrComponent implements StanbolCamelC
 	}
 
 	/**
-	 * <p>Sets the URI Scheme managed by the component</p>
-	 * @param uriScheme The URI scheme to be used
+	 * <p>
+	 * Sets the URI Scheme managed by the component
+	 * </p>
+	 * 
+	 * @param uriScheme
+	 *            The URI scheme to be used
 	 */
 	public void setURIScheme(String uriScheme) {
 		this.uriScheme = uriScheme;
 	}
 
 	/**
-	 * <p>Activate method</p>
-	 * @param ce The {@code ComponentContext} object
+	 * <p>
+	 * Activate method
+	 * </p>
+	 * 
+	 * @param ce
+	 *            The {@code ComponentContext} object
 	 */
 	@Activate
 	public void activate(ComponentContext ce) {
 		@SuppressWarnings("rawtypes")
 		Dictionary props = ce.getProperties();
-		uriScheme = (String) props.get(StanbolCamelComponent.URI_SCHEME_PROPERTY);
+		uriScheme = (String) props
+				.get(StanbolCamelComponent.URI_SCHEME_PROPERTY);
 		uriScheme = uriScheme == null ? DEFAULT_URI_SCHEME : uriScheme;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.apache.stanbol.workflow.component.core.StanbolCamelComponent#getAsCamelComponent()
+	 * 
+	 * @see org.apache.stanbol.workflow.component.core.StanbolCamelComponent#
+	 * getAsCamelComponent()
 	 */
 	@Override
 	public Component getAsCamelComponent() {
@@ -83,52 +111,68 @@ public class StanbolSolrComponent extends SolrComponent implements StanbolCamelC
 	}
 
 	/**
-	 * <p>Creates the Endpoint using the component configuration</p>
+	 * <p>
+	 * Creates the Endpoint using the component configuration
+	 * </p>
 	 */
 	@Override
-	protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
-		StanbolSolrEndpoint endpoint = new StanbolSolrEndpoint(uri, this, remaining, parameters);
+	protected Endpoint createEndpoint(String uri, String remaining,
+			Map<String, Object> parameters) throws Exception {
+		StanbolSolrEndpoint endpoint = new StanbolSolrEndpoint(uri, this,
+				remaining, parameters);
 		setProperties(endpoint, parameters);
 		parameters.clear();
 		return endpoint;
-		
+
 	}
-	
+
 	/**
-	 * <p>Gets the Solr Server used to insert, delete and commit documents</p>
+	 * <p>
+	 * Gets the Solr Server used to insert, delete and commit documents
+	 * </p>
 	 * 
-	 * @param endpoint The {@code StanbolSolrEndpoint} instance
+	 * @param endpoint
+	 *            The {@code StanbolSolrEndpoint} instance
 	 * @return the Solr server associated with this endpoint
 	 */
 	public HttpSolrServer getSolrServer(StanbolSolrEndpoint endpoint) {
 		return this.getSolrServers(endpoint).getSolrServer();
 	}
-	
+
 	/**
-	 * <p>Gets the Solr server used to insert documents in streaming mode</p>
+	 * <p>
+	 * Gets the Solr server used to insert documents in streaming mode
+	 * </p>
 	 * 
-	 * @param endpoint The {@code StanbolSolrEndpoint} instance
+	 * @param endpoint
+	 *            The {@code StanbolSolrEndpoint} instance
 	 * @return the streaming Solr Server associated with this endpoint
 	 */
-	public ConcurrentUpdateSolrServer getUpdateSolrServer(StanbolSolrEndpoint endpoint) {
+	public ConcurrentUpdateSolrServer getUpdateSolrServer(
+			StanbolSolrEndpoint endpoint) {
 		return this.getSolrServers(endpoint).getUpdateSolrServer();
 	}
-	
+
 	/**
-	 * <p>Sets the {@code NamespacePrefixProvider} instance</p>
+	 * <p>
+	 * Sets the {@code NamespacePrefixProvider} instance
+	 * </p>
+	 * 
 	 * @param ns
 	 */
 	public void setNamespacePrefixService(NamespacePrefixService ns) {
 		this.namespacePrefixService = ns;
 	}
-	
+
 	/**
-	 * <p>Gets the {@code NamespacePrefixProvider} instance</p>
+	 * <p>
+	 * Gets the {@code NamespacePrefixProvider} instance
+	 * </p>
+	 * 
 	 * @param ns
 	 */
 	public NamespacePrefixService getNamespacePrefixService() {
 		return this.namespacePrefixService;
 	}
-	
 
 }

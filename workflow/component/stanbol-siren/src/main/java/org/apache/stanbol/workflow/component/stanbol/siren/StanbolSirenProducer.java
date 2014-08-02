@@ -1,7 +1,5 @@
-package org.apache.stanbol.workflow.component.stanbol.solr;
+package org.apache.stanbol.workflow.component.stanbol.siren;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.camel.Exchange;
@@ -11,25 +9,27 @@ import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
+import org.apache.stanbol.workflow.component.stanbol.solr.SolrProducerWrapper;
 import org.apache.stanbol.workflow.component.stanbol.solr.helper.ContentItemHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Multimap;
+import com.google.gson.Gson;
 
 /**
- * <p>StanbolSolrProducer class</p>
- * <p>Camel producer for {@code StanbolSolrComponent} component</p>
+ * <p>StanbolSirenProducer class</p>
+ * <p>Camel producer for {@code StanbolSirenComponent} component</p>
  * 
  * @author Antonio David Perez Morales <adperezmorales@gmail.com>
  *
  */
-public class StanbolSolrProducer extends SolrProducerWrapper {
+public class StanbolSirenProducer extends SolrProducerWrapper {
 	
 	private static final Logger log = LoggerFactory
-			.getLogger(StanbolSolrProducer.class);
+			.getLogger(StanbolSirenProducer.class);
 
-	public StanbolSolrProducer(StanbolSolrEndpoint endpoint,
+	public StanbolSirenProducer(StanbolSirenEndpoint endpoint,
 			HttpSolrServer solrServer,
 			ConcurrentUpdateSolrServer streamingSolrServer) {
 		super(endpoint, solrServer, streamingSolrServer);
@@ -38,22 +38,10 @@ public class StanbolSolrProducer extends SolrProducerWrapper {
 	@Override
 	protected void prepareExchangeToSolr(Exchange exchange, ContentItem ci,
 			Set<String> fieldNames) {
-		
 		{
-			StanbolSolrEndpoint endpoint = (StanbolSolrEndpoint) this.getEndpoint();
-			Multimap<String, String> enhancementMetadata = ContentItemHelper.extractFields(ci,
-					fieldNames, endpoint.getComponent().getNamespacePrefixService());
 			Message in = exchange.getIn();
 			/* Set insert operation */
 			in.setHeader(SolrConstants.OPERATION, SolrConstants.OPERATION_INSERT);
-			Map<String, Collection<String>> map = enhancementMetadata.asMap();
-
-			/* Add fields */
-			for (String key : map.keySet()) {
-				if (map.containsKey(key)) {
-					in.setHeader(SolrConstants.FIELD + key, map.get(key));
-				}
-			}
 
 			/* Set the content field */
 			/*
@@ -74,7 +62,15 @@ public class StanbolSolrProducer extends SolrProducerWrapper {
 				log.error("Unable to Extract Text Content from ContentItem", e);
 			}
 			in.setHeader(SolrConstants.FIELD + "content", content);
-
+			
+			// Entities Json
+			StanbolSirenEndpoint endpoint = (StanbolSirenEndpoint) this.getEndpoint();
+			Multimap<String, String> enhancementMetadata = ContentItemHelper.extractFields(ci,
+					fieldNames, endpoint.getComponent().getNamespacePrefixService());
+			
+			Gson gson = new Gson();
+			String entitiesJson = gson.toJson(enhancementMetadata.asMap());
+			in.setHeader(SolrConstants.FIELD + "json", entitiesJson);
 		}
 	}
 
